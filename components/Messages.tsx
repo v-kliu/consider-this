@@ -26,6 +26,10 @@ const Messages = forwardRef<
               msg.type === "user_message" ||
               msg.type === "assistant_message"
             ) {
+              
+              // Store the message content and role in variables
+              const { role, content } = msg.message;
+              
               return (
                 <motion.div
                   key={msg.type + index}
@@ -53,9 +57,9 @@ const Messages = forwardRef<
                       "text-xs capitalize font-medium leading-none opacity-50 pt-4 px-3"
                     )}
                   >
-                    {msg.message.role}
+                    {role}
                   </div>
-                  <div className={"pb-3 px-3"}>{msg.message.content}</div>
+                  <div className={"pb-3 px-3"}>{content}</div>
                   <Expressions values={msg.models.prosody?.scores ?? {}} />
                 </motion.div>
               );

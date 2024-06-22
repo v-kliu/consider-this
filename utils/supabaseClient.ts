@@ -1,4 +1,5 @@
-import { InsertConversationPayload } from '@/types/types';
+// supabaseUtils.ts
+import { InsertConversationPayload, MessageContent } from '@/types/types';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
@@ -10,13 +11,59 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const insertConversation = async (payload: InsertConversationPayload) => {
+export interface ConversationData {
+  id: string;
+  conversation: { [key: number]: MessageContent };
+  participants: string[];
+}
+
+export const insertNewConversation = async (): Promise<ConversationData[]> => {
+  const payload: InsertConversationPayload = {
+    conversation: {},
+    participants: [],
+  };
+
   const { data, error } = await supabase
     .from('conversations')
-    .insert([payload]);
+    .insert([payload])
+    .select();
 
   if (error) {
     throw error;
   }
-  return data;
+  return data as ConversationData[];
+};
+
+export const addMessageToConversation = async (
+  conversationId: string,
+  messageId: number,
+  messageContent: MessageContent
+): Promise<ConversationData[]> => {
+  // Fetch the current conversation
+  const { data: conversationData, error: fetchError } = await supabase
+    .from('conversations')
+    .select('conversation')
+    .eq('id', conversationId)
+    .single();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
+  // Add new message to the conversation
+  const updatedConversation = {
+    ...conversationData.conversation,
+    [messageId]: messageContent,
+  };
+
+  const { data, error } = await supabase
+    .from('conversations')
+    .update({ conversation: updatedConversation })
+    .eq('id', conversationId)
+    .select();
+
+  if (error) {
+    throw error;
+  }
+  return data as ConversationData[];
 };

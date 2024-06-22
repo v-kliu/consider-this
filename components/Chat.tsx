@@ -5,9 +5,8 @@ import { VoiceProvider } from "@humeai/voice-react";
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
-
-import { MessageContent, InsertConversationPayload } from "@/types/types";
-import { insertConversation } from "@/utils/supabaseClient";
+import { MessageContent } from "@/types/types";
+import { ConversationData, addMessageToConversation, insertNewConversation } from "@/utils/supabaseClient";
 
 export default function ClientComponent({
   accessToken,
@@ -19,41 +18,51 @@ export default function ClientComponent({
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
   const handleStart = async () => {
-    // Define the messages
-    const message1: MessageContent = {
-      from: "Lucas",
-      from_content: "I love you!",
-      from_attributes: "heartfelt, excited, happy",
-      to: "Victor",
-      to_content: "That's crazy dawg",
-      to_attributes: "confused, amused, entertained",
-    };
-
-    const message2: MessageContent = {
-      from: "Victor",
-      from_content: "Really? Tell me more!",
-      from_attributes: "curious, excited, happy",
-      to: "Lucas",
-      to_content: "Of course, I will!",
-      to_attributes: "confident, happy, enthusiastic",
-    };
-
-    // Define the conversation structure
-    const conversation = {
-      0: message1,
-      1: message2,
-    };
-
-    const payload: InsertConversationPayload = {
-      conversation,
-      participants: ["Lucas", "Victor"],
-    };
-
     try {
-      const data = await insertConversation(payload);
-      console.log('Conversation inserted successfully:', data);
+      // Insert a new conversation
+      console.log('Inserting a new conversation...');
+      const conversationData: ConversationData[] = await insertNewConversation();
+      if (!conversationData || conversationData.length === 0) {
+        throw new Error("Failed to insert new conversation");
+      }
+
+      console.log('New conversation inserted successfully:', conversationData);
+
+      // Get the conversation ID
+      const conversationId = conversationData[0].id;
+      console.log('Conversation ID:', conversationId);
+
+      // Define the messages
+      const message1: MessageContent = {
+        from: "Lucas",
+        from_content: "I love you!",
+        from_attributes: "heartfelt, excited, happy",
+        to: "Victor",
+        to_content: "That's crazy dawg",
+        to_attributes: "confused, amused, entertained",
+      };
+
+      const message2: MessageContent = {
+        from: "Victor",
+        from_content: "Really? Tell me more!",
+        from_attributes: "curious, excited, happy",
+        to: "Lucas",
+        to_content: "Of course, I will!",
+        to_attributes: "confident, happy, enthusiastic",
+      };
+
+      // Add messages to the conversation
+      console.log('Adding messages to the conversation...');
+      await addMessageToConversation(conversationId, 0, message1);
+      console.log('Message 1 added successfully to the conversation');
+      console.log('Adding messages to the conversation...');
+      await addMessageToConversation(conversationId, 1, message2);
+      console.log('Message 2 added successfully to the conversation');
+
+      console.log('Messages added successfully to the conversation');
+
     } catch (error) {
-      console.error('Error inserting conversation:', error);
+      console.error('Error handling conversation:', error);
     }
 
     setStarted(true);
