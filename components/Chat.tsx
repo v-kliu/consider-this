@@ -6,6 +6,18 @@ import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
 
+import { createClient } from '@supabase/supabase-js';
+import { env } from "process";
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Supabase URL or anonymous key is not defined");
+}
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 export default function ClientComponent({
   accessToken,
 }: {
@@ -15,7 +27,19 @@ export default function ClientComponent({
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
-  const handleStart = () => {
+  const handleStart = async () => {
+        // Insert a row into the 'conversations' table
+        console.log('Inserting conversation...');
+        const { data, error } = await supabase
+        .from('conversations')
+        .insert([{ conversation: {}, participants: [] }]);
+  
+      if (error) {
+        console.error('Error inserting conversation:', error);
+      } else {
+        console.log('Conversation inserted successfully:', data);
+      }
+
     setStarted(true);
   };
 
