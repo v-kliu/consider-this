@@ -37,7 +37,7 @@ export const insertNewConversation = async (): Promise<ConversationData[]> => {
 export const addMessageToConversation = async (
   conversationId: string,
   messageId: number,
-  messageContent: MessageContent
+  messageContent: Partial<MessageContent> = {}
 ): Promise<ConversationData[]> => {
   // Fetch the current conversation
   const { data: conversationData, error: fetchError } = await supabase
@@ -50,10 +50,13 @@ export const addMessageToConversation = async (
     throw fetchError;
   }
 
-  // Add new message to the conversation
+  // Add or update message in the conversation
   const updatedConversation = {
     ...conversationData.conversation,
-    [messageId]: messageContent,
+    [messageId]: {
+      ...conversationData.conversation[messageId],
+      ...messageContent,
+    },
   };
 
   const { data, error } = await supabase
