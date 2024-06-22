@@ -1,6 +1,7 @@
 import 'server-only';
 import { fetchAccessToken } from "@humeai/voice";
 
+
 export const getHumeAccessToken = async (): Promise<string | null> => {
   const apiKey = process.env.HUME_API_KEY;
   const secretKey = process.env.HUME_CLIENT_SECRET;
