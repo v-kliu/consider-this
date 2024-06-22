@@ -6,17 +6,8 @@ import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
 
-import { createClient } from '@supabase/supabase-js';
-import { env } from "process";
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL or anonymous key is not defined");
-}
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { MessageContent, InsertConversationPayload } from "@/types/types";
+import { insertConversation } from "@/utils/supabaseClient";
 
 export default function ClientComponent({
   accessToken,
@@ -28,17 +19,42 @@ export default function ClientComponent({
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
   const handleStart = async () => {
-        // Insert a row into the 'conversations' table
-        console.log('Inserting conversation...');
-        const { data, error } = await supabase
-        .from('conversations')
-        .insert([{ conversation: {}, participants: [] }]);
-  
-      if (error) {
-        console.error('Error inserting conversation:', error);
-      } else {
-        console.log('Conversation inserted successfully:', data);
-      }
+    // Define the messages
+    const message1: MessageContent = {
+      from: "Lucas",
+      from_content: "I love you!",
+      from_attributes: "heartfelt, excited, happy",
+      to: "Victor",
+      to_content: "That's crazy dawg",
+      to_attributes: "confused, amused, entertained",
+    };
+
+    const message2: MessageContent = {
+      from: "Victor",
+      from_content: "Really? Tell me more!",
+      from_attributes: "curious, excited, happy",
+      to: "Lucas",
+      to_content: "Of course, I will!",
+      to_attributes: "confident, happy, enthusiastic",
+    };
+
+    // Define the conversation structure
+    const conversation = {
+      0: message1,
+      1: message2,
+    };
+
+    const payload: InsertConversationPayload = {
+      conversation,
+      participants: ["Lucas", "Victor"],
+    };
+
+    try {
+      const data = await insertConversation(payload);
+      console.log('Conversation inserted successfully:', data);
+    } catch (error) {
+      console.error('Error inserting conversation:', error);
+    }
 
     setStarted(true);
   };
