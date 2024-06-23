@@ -6,6 +6,7 @@ import ChatBox from "./ChatBox";
 import Agent from "./Agent";
 import logo from './images/socratesLogo.png';
 import CustomTypingEffect from './CustomTypingEffect';
+import { Footer } from "./Footer";
 
 export default function ClientComponent({ accessToken }: { accessToken: string; }) {
   const [started, setStarted] = useState(false);
@@ -77,6 +78,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
             Start
           </button>
         </div>
+        <Footer />
       </div>
       )}
 

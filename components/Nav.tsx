@@ -13,6 +13,7 @@ export const Nav = () => {
   };
 
   return (
+    <>
     <div
       className={
         "px-4 py-2 flex items-center h-14 z-50 bg-[#F4EDD8] border-b border-[#915018] font-[Press Start 2P] pixelate"
@@ -20,11 +21,12 @@ export const Nav = () => {
     >
       <div className="flex items-center gap-2">
         <img src={logo.src} alt="Logo" style={{ width: '40px', height: '40px' }} />
-        <span className="text-lg font-bold text-[#6C3F18]">Consider This</span>
+        <span className="text-lg font-bold text-[#6C3F18] ">Consider This</span>
       </div>
-      <div className="absolute left-1/2 transform -translate-x-1/2 text-center">
-        <span className="text-sm text-[#6C3F18]">Made with ♡ at the Berkeley AI Hackathon</span>
+      <div className="flex-1 flex justify-center items-center relative">
+        <h1 style={{ fontSize: '0.65rem' }} className="text-center text-[#6C3F18] font-[Press Start 2P]">Made with ♡ at the Berkeley AI Hackathon</h1>
       </div>
+
       <div className={"ml-auto flex items-center gap-1"}>
         <Button
           onClick={toggleMenu}
@@ -42,5 +44,6 @@ export const Nav = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
