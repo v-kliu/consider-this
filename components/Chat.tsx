@@ -1,33 +1,32 @@
 "use client";
 
-import { useState, useRef, ComponentRef } from "react";
-import { VoiceProvider } from "@humeai/voice-react";
-import Messages from "./Messages";
-import Controls from "./Controls";
-import StartCall from "./StartCall";
+import { SetStateAction, useState } from "react";
+import ChatBox from "./ChatBox";
 
-export default function ClientComponent({
-  accessToken,
-}: {
-  accessToken: string;
-}) {
+export default function ClientComponent({ accessToken }: { accessToken: string; }) {
   const [started, setStarted] = useState(false);
-  const timeout = useRef<number | null>(null);
-  const ref = useRef<ComponentRef<typeof Messages> | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [messages, setMessages] = useState([
+    { sender: 'Alice', text: 'Hello, how are you?' },
+  ]);
 
   const handleStart = () => {
     setStarted(true);
   };
 
+  const handleNewMessageChange = (e: { target: { value: SetStateAction<string>; }; }) => {
+    setNewMessage(e.target.value);
+  };
+
+  const handleSendMessage = () => {
+    if (newMessage.trim() !== '') {
+      setMessages([...messages, { sender: 'You', text: newMessage }]);
+      setNewMessage(''); // Clear input after sending
+    }
+  };
+
   return (
-    <div
-      className={
-        "relative grow flex flex-col mx-auto w-full overflow-hidden h-[0px] dark:bg-gray-900"
-      }
-    >
-
-
-      
+    <div className="relative grow flex flex-col mx-auto w-full overflow-hidden h-screen dark:bg-gray-900">
       {!started && (
         <div className="mt-40">
           {/* Project Description */}
@@ -51,35 +50,29 @@ export default function ClientComponent({
         </div>
       )}
 
-
-
-      {
-        started && (
-          <VoiceProvider
-            auth={{ type: "accessToken", value: accessToken }}
-            onMessage={() => {
-              if (timeout.current) {
-                window.clearTimeout(timeout.current);
-              }
-
-              timeout.current = window.setTimeout(() => {
-                if (ref.current) {
-                  const scrollHeight = ref.current.scrollHeight;
-
-                  ref.current.scrollTo({
-                    top: scrollHeight,
-                    behavior: "smooth",
-                  });
-                }
-              }, 200);
-            }}
-          >
-            <Messages ref={ref} />
-            <Controls />
-            <StartCall />
-          </VoiceProvider>
-        )
-      }
-    </div >
+      {started && (
+        <>
+        {/* test ChatBox */}
+          {/* <div className="flex-1 p-4">
+            <div className="flex">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={handleNewMessageChange}
+                className="flex-1 p-2 border-2 border-gray-200 rounded-md"
+                placeholder="Type your message here..."
+              />
+              <button
+                onClick={handleSendMessage}
+                className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+              >
+                Send
+              </button>
+            </div>
+          </div> */}
+          <ChatBox messages={messages} />
+        </>
+      )}
+    </div>
   );
 }
