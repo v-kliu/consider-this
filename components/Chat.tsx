@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ComponentRef, useEffect } from "react";
+import { useState, useRef, useEffect, ComponentRef } from "react";
 import { VoiceProvider } from "@humeai/voice-react";
 import ChatBox from "./ChatBox";
 import logo from './logos/socratesLogo.png';
@@ -25,10 +25,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
   const [voiceProviderKey, setVoiceProviderKey] = useState(0);
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([{ sender: 'Alice', text: 'Hello, how are you?' }]);
-  const [agents, setAgents] = useState([
-    { active: true, text: 'Agent 1' },
-    { active: false, text: 'Agent 2' }
-  ]);
+
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
@@ -65,7 +62,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
     setStarted(true);
   };
 
-  const handleNewMessageChange = (e: { target: { value: string; }; }) => {
+  const handleNewMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
   };
 
@@ -76,23 +73,8 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
     }
   };
 
-  const switchToConfig1 = () => {
-    setCurrentConfig(CONFIG_ONE);
-    setVoiceProviderKey(prevKey => prevKey + 1);
-    setAgents([
-      { active: true, text: 'Agent 1 Config 1' },
-      { active: false, text: 'Agent 2 Config 1' }
-    ]);
-  };
 
-  const switchToConfig2 = () => {
-    setCurrentConfig(CONFIG_TWO);
-    setVoiceProviderKey(prevKey => prevKey + 1);
-    setAgents([
-      { active: true, text: 'Agent 1 Config 2' },
-      { active: false, text: 'Agent 2 Config 2' }
-    ]);
-  };
+
 
   return (
     <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
@@ -124,32 +106,8 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
 
       {started && (
         <>
-          <div className="flex flex-row space-x-4">
-            {agents.map((agent, index) => (
-              <div key={index} className="w-full md:w-1/2 p-2 pixelate bg-[#E6D7A5] border-4 border-[#915018] rounded-lg">
-                <AgentComponent
-                  active={agent.active}
-                  text={agent.text}
-                  onAgentClick={index === 0 ? switchToConfig2 : switchToConfig1}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="bg-[#E7D7A5] text-[#6C3F18] border-4 border-[#915018] p-4 m-4 rounded-md pixelate">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`mb-2 bg-[#F4EDD8] p-2 rounded-md border-2 border-[#915018] ${
-                  message.sender === 'You' ? 'text-right' : 'text-left'
-                }`}
-              >
-                <span className="font-bold">{message.sender}:</span> {message.text}
-              </div>
-            ))}
-          </div>
           {started && conversationId && initialContext && (
             <VoiceProvider
-              key={voiceProviderKey}
               sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
               configId={configId}
               auth={{ type: "accessToken", value: accessToken }}
@@ -173,6 +131,18 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
               <StartCall />
             </VoiceProvider>
           )}
+
+          <div className="bg-[#E7D7A5] text-[#6C3F18] border-4 border-[#915018] p-4 m-4 rounded-md pixelate">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`mb-2 bg-[#F4EDD8] p-2 rounded-md border-2 border-[#915018] ${message.sender === 'You' ? 'text-right' : 'text-left'
+                  }`}
+              >
+                <span className="font-bold">{message.sender}:</span> {message.text}
+              </div>
+            ))}
+          </div>
         </>
       )}
     </div>
