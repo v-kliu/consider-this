@@ -133,3 +133,17 @@ export const handleEndCall = async (conversationId: string, disconnect: () => vo
   // Call the disconnect function
   disconnect();
 };
+
+export const updateLastMessage = async (
+  conversationId: string,
+  lastMessage: string
+): Promise<void> => {
+  const { error } = await supabase
+    .from('conversations')
+    .update({ last_message: lastMessage })
+    .eq('id', conversationId);
+
+  if (error) {
+    throw error;
+  }
+};

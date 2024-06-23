@@ -8,7 +8,7 @@ import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import fetchConversationData from "@/utils/fetchConversationData";
-import { handleEndCall, updateFormattedConversation } from "@/utils/supabaseClient";
+import { handleEndCall, updateFormattedConversation, updateLastMessage } from "@/utils/supabaseClient";
 import { HumeClient } from "hume";
 
 interface ChatStageProps {
@@ -20,7 +20,7 @@ interface ChatStageProps {
 }
 
 const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConfigId, setStarted, client }) => {
-  const { connect, disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+  const { connect, disconnect, status, isMuted, unmute, mute, micFft, lastVoiceMessage } = useVoice();
   const [conversation, setConversation] = useState<any>({});
 
   useEffect(() => {
@@ -34,6 +34,11 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
 
   const handleSwitchPersona = async () => {
     await handleEndCall(conversationId, disconnect);
+
+    // Update the last_message column with the lastVoiceMessage value
+    if (lastVoiceMessage) {
+      await updateLastMessage(conversationId, lastVoiceMessage.message.content);
+    }
 
     // Change the config ID (example: switch to a different config ID)
     const newConfigId = configId === '384018bf-9638-4236-a762-f45d589f2c00'
