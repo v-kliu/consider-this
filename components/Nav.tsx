@@ -1,13 +1,16 @@
 "use client";
 
 import { useLayoutEffect, useState } from "react";
+
 import Logo from "./logos/socratesLogo.png";
+
 import { Button } from "./ui/button";
 import { Moon, Sun } from "lucide-react";
 import Github from "./logos/GitHub";
 import pkg from '@/package.json';
 
 export const Nav = () => {
+
   return (
     <>
       <div
@@ -29,5 +32,6 @@ export const Nav = () => {
         </div>
       </div>
     </>
+
   );
 };

@@ -5,6 +5,7 @@ import { VoiceProvider } from "@humeai/voice-react";
 import ChatBox from "./ChatBox";
 import logo from './logos/socratesLogo.png';
 import CustomTypingEffect from './CustomTypingEffect';
+
 import { Footer } from "./Footer";
 import Messages from "./Messages";
 import Controls from "./Controls";
@@ -98,6 +99,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
   return (
     <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
       {!started && (
+
         <>
           <div className="flex flex-col items-center justify-center h-full mt-[-5%]">
             <div className="text-center">
@@ -124,6 +126,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
           </div>
           <Footer />
         </>
+
       )}
 
       {started && (
