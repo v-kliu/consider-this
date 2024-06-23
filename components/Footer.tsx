@@ -8,7 +8,7 @@ import logoPelle from './images/boulderLogo.jpg';
 export const Footer = () => {
   const names = [
     { logo: logoSuyash, name: "Suyash N.", color: "#1F4B8E" },
-    { logo: logoLucas, name: "Lucas U.", color: "#003D99" },
+    { logo: logoLucas, name: "Juan Lucas U.", color: "#003D99" },
     { logo: logoPelle, name: "Pelle K.", color: "#333333" },
     { logo: logoVictor, name: "Victor L.", color: "#603FA3" }
   ];

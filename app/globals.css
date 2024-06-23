@@ -1,35 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-body {
-  font-family: 'Press Start 2P', cursive;
-  cursor: url('/lightningCursor.cur'), auto;
-}
-
-.pixelate {
-  image-rendering: pixelated;
-  border-radius: 0; /* Remove rounded corners for a more retro look */
-}
-
-button {
-  font-family: 'Press Start 2P', cursive;
-}
-
-button:hover {
-  cursor: url('/lightningCursor.cur'), auto; /* Ensures cursor remains as lightning bolt on hover */
-}
-
-h1, h2, h3, h4, h5, h6, p, div {
-  font-family: 'Press Start 2P', cursive;
-  image-rendering: pixelated;
-}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-retro;
+  }
+  h1, h2, h3, h4, h5, h6, p, a, span, div {
+    font-family: 'Press Start 2P', cursive;
+  }
+  .font-retro {
+    font-family: 'Press Start 2P', cursive;
+  }
+
   :root {
-    --background: 45 56% 90%;
-    --foreground: 45 56% 90%;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
