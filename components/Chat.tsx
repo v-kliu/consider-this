@@ -15,7 +15,7 @@ export default function ClientComponent({
 }) {
   const [started, setStarted] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [configId, setConfigId] = useState<string>('384018bf-9638-4236-a762-f45d589f2c00'); // Initial config ID
+  const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9'); // Initial config ID
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
   const [client, setClient] = useState<HumeClient | null>(null);
@@ -26,8 +26,8 @@ export default function ClientComponent({
       console.log("I'm fetching context!")
       console.log(conversationId)
       const fetchData = async () => {
-        const { conversationContext, lastMessage } = await fetchConversationContextAndLastMessage(conversationId);
-        setInitialContext(`${conversationContext}\n${lastMessage}`);
+        const resultString = await fetchConversationContextAndLastMessage(conversationId);
+        setInitialContext(resultString);
       };
       fetchData();
     }

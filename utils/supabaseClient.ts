@@ -68,12 +68,27 @@ export const addMessageToConversation = async (
     throw fetchError;
   }
 
+  // Function to truncate content after '{'
+  const truncateContent = (content: string | undefined): string | undefined => {
+    if (content && content.includes('{')) {
+      return content.split('{')[0];
+    }
+    return content;
+  };
+
+  // Apply truncation to the messageContent fields
+  const truncatedMessageContent = {
+    ...messageContent,
+    from_content: truncateContent(messageContent.from_content),
+    to_content: truncateContent(messageContent.to_content),
+  };
+
   // Add or update message in the conversation
   const updatedConversation = {
     ...conversationData.conversation,
     [messageId]: {
       ...conversationData.conversation[messageId],
-      ...messageContent,
+      ...truncatedMessageContent,
     },
   };
 
@@ -104,8 +119,8 @@ export const updateFormattedConversation = async (
     throw fetchError;
   }
 
-  // Append the formatted conversation to the conversation_context
-  const updatedContext = (currentData.conversation_context || '') + '\n' + formattedConversation;
+  // Add new conversation_context
+  const updatedContext = formattedConversation;
 
   const { data, error } = await supabase
     .from('conversations')
@@ -150,7 +165,7 @@ export const updateLastMessage = async (
 
 export const fetchConversationContextAndLastMessage = async (
   conversationId: string
-): Promise<{ conversationContext: string; lastMessage: string }> => {
+): Promise<string> => {
   const { data, error } = await supabase
     .from('conversations')
     .select('conversation_context, last_message')
@@ -161,8 +176,24 @@ export const fetchConversationContextAndLastMessage = async (
     throw error;
   }
 
-  return {
+  const result = {
     conversationContext: data.conversation_context,
     lastMessage: data.last_message,
   };
+
+  // Convert everything to a string
+  const resultString = JSON.stringify(result);
+
+  return resultString;
+};
+
+export const clearConversationContext = async (conversationId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('conversations')
+    .update({ conversation_context: '' })
+    .eq('id', conversationId);
+
+  if (error) {
+    throw error;
+  }
 };
