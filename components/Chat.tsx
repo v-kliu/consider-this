@@ -3,10 +3,15 @@
 import { ComponentRef, useRef, useState } from "react";
 import { VoiceProvider } from "@humeai/voice-react";
 import ChatBox from "./ChatBox";
+
+import Agent from "./Agent";
+import logo from './images/socratesLogo.png';
+import CustomTypingEffect from './CustomTypingEffect';
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
 import AgentComponent from "./Agent";
+
 
 // Initial config setup
 const CONFIG_ONE = "5a0c849f-bf21-4f9d-97f0-958ff8619fba";
@@ -62,62 +67,98 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
   };
 
   return (
-    <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900">
+    <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
       {!started && (
-        <div className="mt-40">
-          <div className="p-4 bg-gray-100 dark:bg-gray-800 text-center rounded-md mb-4 mx-auto w-3/4">
-            <h1 className="text-2xl font-bold mb-2 text-black dark:text-gray-100">Consider-This</h1>
-            <p className="text-lg text-black dark:text-gray-300">
-              The AI Socratic Seminar project aims to facilitate open discussions and provide differing viewpoints, leveraging Hume's empathetic model to foster understanding and empathy among participants. This innovative platform encourages meaningful dialogue and the exchange of diverse perspectives.
-            </p>
-          </div>
-          <div className="p-4 text-center rounded-md mb-4 mx-auto w-3/4">
-            <button
-              onClick={handleStart}
-              className="bg-[#ee8822] text-black py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#b3c8e3] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#a2b8d4] dark:hover:bg-[#90a7c5] font-bold transition-transform duration-150"
-            >
-              Start
-            </button>
-          </div>
+      <div className="flex flex-col items-center justify-center h-full mt-[-5%]">
+        <div className="text-center">
+          {/* Logo */}
+          <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
+
+          <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Consider This</h1>
+          <CustomTypingEffect
+            lines={[
+              "Facilitate open discussions and gain diverse viewpoints with our AI Socratic Seminar platform."
+            ]}
+            speed={100}
+            eraseDelay={2000}
+            typingDelay={200}
+            pauseDelay={4000}
+          />
+
         </div>
+
+        <div className="mt-8">
+          <button
+            onClick={handleStart}
+            className="bg-[#ee8822] text-black py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#b3c8e3] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#a2b8d4] dark:hover:bg-[#90a7c5] font-bold transition-transform duration-150"
+          >
+            Start
+          </button>
+        </div>
+      </div>
       )}
+
+
+
       {started && (
         <>
-          <ChatBox messages={messages} />
+
+          {/* Agents */}
           <div className="flex flex-row space-x-4">
-            {agents.map((agent, index) => (
-              <AgentComponent
-                key={`agent-${index}`}
-                active={agent.active}
-                text={agent.text}
-                onAgentClick={index === 0 ? switchToConfig2 : switchToConfig1}
-              />
-            ))}
+            <div className="w-full md:w-1/2 p-2 pixelate bg-[#E6D7A5] border-4 border-[#915018] rounded-lg">
+              {agentOneData.map((agent, index) => (
+                <Agent
+                  key={index}
+                  initialActive={agent.initialActive}
+                  initialReveal={agent.initialReveal}
+                  initialIdea={agent.initialIdea}
+                  text={agent.text}
+                  agentOneReveal={handleAgentReveal}
+                />
+              ))}
+            </div>
+            <div className="w-full md:w-1/2 p-2 pixelate bg-[#E6D7A5] border-4 border-[#915018] rounded-lg">
+              {agentTwoData.map((agent, index) => (
+                <Agent
+                  key={index}
+                  initialActive={agent.initialActive}
+                  initialReveal={agent.initialReveal}
+                  initialIdea={agent.initialIdea}
+                  text={agent.text}
+                  agentOneReveal={handleAgentReveal}
+                />
+              ))}
+            </div>
           </div>
-          <VoiceProvider
-            key={voiceProviderKey}
-            configId={currentConfig}
-            auth={{ type: "accessToken", value: accessToken }}
-            onMessage={() => {
-              if (timeout.current) {
-                window.clearTimeout(timeout.current);
-              }
-              timeout.current = window.setTimeout(() => {
-                if (ref.current) {
-                  const scrollHeight = ref.current.scrollHeight;
-                  ref.current.scrollTo({
-                    top: scrollHeight,
-                    behavior: "smooth",
-                  });
-                }
-              }, 200);
-            }}
-          >
-            <Messages ref={ref} />
-            <Controls />
-            <StartCall />
-          </VoiceProvider>
-          <ChatBox messages={messages} />
+
+          {/* ChatBox */}
+          <div className="bg-[#E7D7A5] text-[#6C3F18] border-4 border-[#915018] p-4 m-4 rounded-md pixelate">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`mb-2 bg-[#F4EDD8] p-2 rounded-md border-2 border-[#915018] ${
+                  message.sender === 'You' ? 'text-right' : 'text-left'
+                }`}
+              >
+                <span className="font-bold">{message.sender}:</span> {message.text}
+              </div>
+            ))}
+            <div className="flex mt-2">
+              <input
+                className="flex-grow p-2 border-2 border-[#915018] rounded-md pixelate bg-[#FFF] text-[#6C3F18]"
+                type="text"
+                value={newMessage}
+                onChange={handleNewMessageChange}
+                placeholder="Type your message..."
+              />
+              <button
+                className="bg-[#F1602C] text-white py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#D52429] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#915018] dark:hover:bg-[#6C3F18] font-bold transition-transform duration-150 pixelate"
+                onClick={handleSendMessage}
+              >
+                Send
+              </button>
+            </div>
+          </div>
         </>
       )}
     </div>
