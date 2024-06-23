@@ -1,33 +1,33 @@
-"use client"; // Add this line at the top
+"use client";
 
-import React from "react";
-import { useState } from "react";
+import { ComponentRef, useRef, useState } from "react";
+import { VoiceProvider } from "@humeai/voice-react";
 import ChatBox from "./ChatBox";
+
 import Agent from "./Agent";
 import logo from './images/socratesLogo.png';
 import CustomTypingEffect from './CustomTypingEffect';
+import Messages from "./Messages";
+import Controls from "./Controls";
+import StartCall from "./StartCall";
+import AgentComponent from "./Agent";
 
-export default function ClientComponent({ accessToken }: { accessToken: string; }) {
+
+// Initial config setup
+const CONFIG_ONE = "5a0c849f-bf21-4f9d-97f0-958ff8619fba";
+const CONFIG_TWO = "dbe866f5-2bb7-44df-a73c-846feb59f4ec";
+
+export default function ClientComponent({ accessToken }: { accessToken: string }) {
   const [started, setStarted] = useState(false);
+  const [currentConfig, setCurrentConfig] = useState(CONFIG_ONE);
+  const [voiceProviderKey, setVoiceProviderKey] = useState(0);
+  const timeout = useRef<number | null>(null);
+  const ref = useRef<ComponentRef<typeof Messages> | null>(null);
   const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState([
-    { sender: 'Alice', text: 'Hello, how are you?' },
-  ]);
-  const [agentOneData, setAgentOneData] = useState([
-    {
-      initialActive: true,
-      initialReveal: true,
-      initialIdea: true,
-      text: 'Agent 1',
-    }
-  ]);
-  const [agentTwoData, setAgentTwoData] = useState([
-    {
-      initialActive: false,
-      initialReveal: false,
-      initialIdea: false,
-      text: 'Agent 2',
-    }
+  const [messages, setMessages] = useState([{ sender: 'Alice', text: 'Hello, how are you?' }]);
+  const [agents, setAgents] = useState([
+    { active: true, text: 'Agent 1' },
+    { active: false, text: 'Agent 2' }
   ]);
 
   const handleStart = () => {
@@ -41,12 +41,29 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
   const handleSendMessage = () => {
     if (newMessage.trim() !== '') {
       setMessages([...messages, { sender: 'You', text: newMessage }]);
-      setNewMessage(''); // Clear input after sending
+      setNewMessage('');
     }
   };
 
-  const handleAgentReveal = () => {
-    console.log("MODIFY THIS TO BE API CALL")
+  const switchToConfig1 = () => {
+    setCurrentConfig(CONFIG_ONE);
+    setVoiceProviderKey(prevKey => prevKey + 1);
+    setAgents([
+      { active: true, text: 'Agent 1 Config 1' },
+      { active: false, text: 'Agent 2 Config 1' }
+    ]);
+    console.log("1");
+  };
+
+  const switchToConfig2 = () => {
+    setCurrentConfig(CONFIG_TWO);
+    setVoiceProviderKey(prevKey => prevKey + 1);
+    setAgents([
+      { active: true, text: 'Agent 1 Config 2' },
+      { active: false, text: 'Agent 2 Config 2' }
+    ]);
+    console.log("2");
+
   };
 
   return (
@@ -67,6 +84,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
             typingDelay={200}
             pauseDelay={4000}
           />
+
         </div>
 
         <div className="mt-8">
@@ -79,6 +97,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
         </div>
       </div>
       )}
+
 
 
       {started && (
