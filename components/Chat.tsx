@@ -7,6 +7,7 @@ import Controls from "./Controls";
 import StartCall from "./StartCall";
 import { HumeClient } from "hume";
 import { ConversationData, addMessageToConversation, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
+import logo from './logos/socratesLogo.png';
 
 export default function ClientComponent({
   accessToken,
@@ -65,36 +66,39 @@ export default function ClientComponent({
   };
 
   return (
-    <div
-      className={
-        "relative grow flex flex-col mx-auto w-full overflow-hidden h-[0px] dark:bg-gray-900"
-      }
-    >
-
-
       
-      {!started && (
-        <div className="mt-40">
-          {/* Project Description */}
-          <div className="p-4 bg-gray-100 dark:bg-gray-800 text-center rounded-md mb-4 mx-auto w-3/4">
-            <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Project Luarnisplon</h1>
-            <p className="text-lg text-gray-700 dark:text-gray-300">
-              This project aims to provide seamless voice interaction through advanced AI technology.
-              Experience the next level of communication with our innovative platform.
-            </p>
+      <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
+        {!started && (
+        <div className="flex flex-col items-center p-4 justify-center h-full mt-[-5%]">
+          <div className="text-center">
+            {/* Logo */}
+            <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
+
+            <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Lesson 1: AI </h1>
+            {/* <CustomTypingEffect
+              lines={[
+                "Facilitate open discussions and gain diverse viewpoints with our AI Socratic Seminar platform."
+              ]}
+              speed={100}
+              eraseDelay={2000}
+              typingDelay={200}
+              pauseDelay={4000}
+            /> */}
+            <div className="text-sm text-stone-400 mx-auto p-4 leading-loose">
+              Challenge what you know (and what you don't!) <br/> with our AI Socratic Seminar platform!
+            </div>
           </div>
 
-          {/* Start Button */}
-          <div className="p-4 bg-gray-100 dark:bg-gray-800 text-center rounded-md mb-4 mx-auto w-3/4">
+          <div className="mt-8">
             <button
               onClick={handleStart}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-800"
+              className="bg-[#ee8822] text-black py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#b3c8e3] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#a2b8d4] dark:hover:bg-[#90a7c5] font-bold transition-transform duration-150"
             >
               Start
             </button>
           </div>
         </div>
-      )}
+        )}
 
 
 
