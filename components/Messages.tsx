@@ -8,11 +8,9 @@ import MessageLogger from "./MessageLogger";
 
 const Messages = forwardRef<
   ComponentRef<typeof motion.div>,
-
   { conversationId: string }
 >(function Messages({ conversationId }, ref) {
   const { messages } = useVoice();
-
 
   return (
     <motion.div

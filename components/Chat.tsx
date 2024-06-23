@@ -1,42 +1,25 @@
 "use client";
 
-
 import { useState, useRef, ComponentRef, useEffect } from "react";
-
 import { VoiceProvider } from "@humeai/voice-react";
-import ChatBox from "./ChatBox";
-import logo from './images/socratesLogo.png';
-import CustomTypingEffect from './CustomTypingEffect';
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
-
 import { HumeClient } from "hume";
 import { ConversationData, addMessageToConversation, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
-import AgentComponent from "./Agent";
 
-
-// Initial config setup
-const CONFIG_ONE = "5a0c849f-bf21-4f9d-97f0-958ff8619fba";
-const CONFIG_TWO = "dbe866f5-2bb7-44df-a73c-846feb59f4ec";
-
-export default function ClientComponent({ accessToken }: { accessToken: string }) {
+export default function ClientComponent({
+  accessToken,
+}: {
+  accessToken: string;
+}) {
   const [started, setStarted] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9'); // Initial config ID
-  const [client, setClient] = useState<HumeClient | null>(null);
-  const [initialContext, setInitialContext] = useState<string | null>(null);
-  const [currentConfig, setCurrentConfig] = useState(CONFIG_ONE);
-  const [voiceProviderKey, setVoiceProviderKey] = useState(0);
-  const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState([{ sender: 'Alice', text: 'Hello, how are you?' }]);
-  const [agents, setAgents] = useState([
-    { active: true, text: 'Agent 1' },
-    { active: false, text: 'Agent 2' }
-  ]);
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
-
+  const [client, setClient] = useState<HumeClient | null>(null);
+  const [initialContext, setInitialContext] = useState<string | null>(null);
 
   useEffect(() => {
     if (configId && conversationId) {
@@ -78,63 +61,34 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
       console.error('Error handling conversation:', error);
     }
 
-
     setStarted(true);
   };
 
-  const handleNewMessageChange = (e: { target: { value: string; }; }) => {
-    setNewMessage(e.target.value);
-  };
-
-  const handleSendMessage = () => {
-    if (newMessage.trim() !== '') {
-      setMessages([...messages, { sender: 'You', text: newMessage }]);
-      setNewMessage('');
-    }
-  };
-
-  const switchToConfig1 = () => {
-    setCurrentConfig(CONFIG_ONE);
-    setVoiceProviderKey(prevKey => prevKey + 1);
-    setAgents([
-      { active: true, text: 'Agent 1 Config 1' },
-      { active: false, text: 'Agent 2 Config 1' }
-    ]);
-  };
-
-  const switchToConfig2 = () => {
-    setCurrentConfig(CONFIG_TWO);
-    setVoiceProviderKey(prevKey => prevKey + 1);
-    setAgents([
-      { active: true, text: 'Agent 1 Config 2' },
-      { active: false, text: 'Agent 2 Config 2' }
-    ]);
-  };
-
   return (
-    <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
-      {!started && (
-        <div className="flex flex-col items-center justify-center h-full mt-[-5%]">
-          <div className="text-center">
-            {/* Logo */}
-            <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
+    <div
+      className={
+        "relative grow flex flex-col mx-auto w-full overflow-hidden h-[0px] dark:bg-gray-900"
+      }
+    >
 
-            <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Consider This</h1>
-            <CustomTypingEffect
-              lines={[
-                "Facilitate open discussions and gain diverse viewpoints with our AI Socratic Seminar platform."
-              ]}
-              speed={100}
-              eraseDelay={2000}
-              typingDelay={200}
-              pauseDelay={4000}
-            />
+
+      
+      {!started && (
+        <div className="mt-40">
+          {/* Project Description */}
+          <div className="p-4 bg-gray-100 dark:bg-gray-800 text-center rounded-md mb-4 mx-auto w-3/4">
+            <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Project Luarnisplon</h1>
+            <p className="text-lg text-gray-700 dark:text-gray-300">
+              This project aims to provide seamless voice interaction through advanced AI technology.
+              Experience the next level of communication with our innovative platform.
+            </p>
           </div>
 
-          <div className="mt-8">
+          {/* Start Button */}
+          <div className="p-4 bg-gray-100 dark:bg-gray-800 text-center rounded-md mb-4 mx-auto w-3/4">
             <button
               onClick={handleStart}
-              className="bg-[#ee8822] text-black py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#b3c8e3] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#a2b8d4] dark:hover:bg-[#90a7c5] font-bold transition-transform duration-150"
+              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-800"
             >
               Start
             </button>
@@ -142,47 +96,23 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
         </div>
       )}
 
-      {started && (
-        <>
-          <div className="flex flex-row space-x-4">
-            {agents.map((agent, index) => (
-              <div key={index} className="w-full md:w-1/2 p-2 pixelate bg-[#E6D7A5] border-4 border-[#915018] rounded-lg">
-                <AgentComponent
-                  active={agent.active}
-                  text={agent.text}
-                  onAgentClick={index === 0 ? switchToConfig2 : switchToConfig1}
-                />
-              </div>
-            ))}
-          </div>
 
 
-          <div className="bg-[#E7D7A5] text-[#6C3F18] border-4 border-[#915018] p-4 m-4 rounded-md pixelate">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`mb-2 bg-[#F4EDD8] p-2 rounded-md border-2 border-[#915018] ${
-                  message.sender === 'You' ? 'text-right' : 'text-left'
-                }`}
-              >
-                <span className="font-bold">{message.sender}:</span> {message.text}
-              </div>
-            ))}
-
-{
+      {
         started && conversationId && initialContext &&(
           <VoiceProvider
-            key={voiceProviderKey}
             sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
-            configId={configId}           
+            configId={configId}
             auth={{ type: "accessToken", value: accessToken }}
             onMessage={() => {
               if (timeout.current) {
                 window.clearTimeout(timeout.current);
               }
+
               timeout.current = window.setTimeout(() => {
                 if (ref.current) {
                   const scrollHeight = ref.current.scrollHeight;
+
                   ref.current.scrollTo({
                     top: scrollHeight,
                     behavior: "smooth",
@@ -195,8 +125,8 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
             <Controls conversationId={conversationId} configId={configId} setConfigId={setConfigId} setStarted={setStarted} client={client} />
             <StartCall />
           </VoiceProvider>
-        </>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }
