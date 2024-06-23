@@ -2,30 +2,38 @@
 
 import { useState, useRef, ComponentRef, useEffect } from "react";
 import { VoiceProvider } from "@humeai/voice-react";
+import ChatBox from "./ChatBox";
+import logo from './logos/socratesLogo.png';
+import CustomTypingEffect from './CustomTypingEffect';
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
 import { HumeClient } from "hume";
-import { ConversationData, addMessageToConversation, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
-import logo from './logos/socratesLogo.png';
+import { ConversationData, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
+import AgentComponent from "./Agent";
 
-export default function ClientComponent({
-  accessToken,
-}: {
-  accessToken: string;
-}) {
+const CONFIG_ONE = "5a0c849f-bf21-4f9d-97f0-958ff8619fba";
+const CONFIG_TWO = "dbe866f5-2bb7-44df-a73c-846feb59f4ec";
+
+export default function ClientComponent({ accessToken }: { accessToken: string }) {
   const [started, setStarted] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9'); // Initial config ID
-  const timeout = useRef<number | null>(null);
-  const ref = useRef<ComponentRef<typeof Messages> | null>(null);
+  const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9');
   const [client, setClient] = useState<HumeClient | null>(null);
   const [initialContext, setInitialContext] = useState<string | null>(null);
+  const [currentConfig, setCurrentConfig] = useState(CONFIG_ONE);
+  const [voiceProviderKey, setVoiceProviderKey] = useState(0);
+  const [newMessage, setNewMessage] = useState('');
+  const [messages, setMessages] = useState([{ sender: 'Alice', text: 'Hello, how are you?' }]);
+  const [agents, setAgents] = useState([
+    { active: true, text: 'Agent 1' },
+    { active: false, text: 'Agent 2' }
+  ]);
+  const timeout = useRef<number | null>(null);
+  const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
   useEffect(() => {
     if (configId && conversationId) {
-      console.log("I'm fetching context!")
-      console.log(conversationId)
       const fetchData = async () => {
         const resultString = await fetchConversationContextAndLastMessage(conversationId);
         setInitialContext(resultString);
@@ -33,9 +41,6 @@ export default function ClientComponent({
       fetchData();
     }
   }, [configId, conversationId]);
-
-  console.log("Chat:");
-  console.log(configId);
 
   const handleStart = async () => {
     try {
@@ -47,16 +52,11 @@ export default function ClientComponent({
       const newConversationId = conversationData[0].id;
       setConversationId(newConversationId);
 
-      // Initialize Hume client
       const humeClient = new HumeClient({
         apiKey: process.env.HUME_API_KEY!,
         secretKey: process.env.HUME_CLIENT_SECRET!,
       });
       setClient(humeClient);
-
-      // const socket = await humeClient.empathicVoice.chat.connect({
-      //   configId,
-      // });
 
     } catch (error) {
       console.error('Error handling conversation:', error);
@@ -65,17 +65,43 @@ export default function ClientComponent({
     setStarted(true);
   };
 
-  return (
-      
-      <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
-        {!started && (
-        <div className="flex flex-col items-center p-4 justify-center h-full mt-[-5%]">
-          <div className="text-center">
-            {/* Logo */}
-            <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
+  const handleNewMessageChange = (e: { target: { value: string; }; }) => {
+    setNewMessage(e.target.value);
+  };
 
-            <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Lesson 1: AI </h1>
-            {/* <CustomTypingEffect
+  const handleSendMessage = () => {
+    if (newMessage.trim() !== '') {
+      setMessages([...messages, { sender: 'You', text: newMessage }]);
+      setNewMessage('');
+    }
+  };
+
+  const switchToConfig1 = () => {
+    setCurrentConfig(CONFIG_ONE);
+    setVoiceProviderKey(prevKey => prevKey + 1);
+    setAgents([
+      { active: true, text: 'Agent 1 Config 1' },
+      { active: false, text: 'Agent 2 Config 1' }
+    ]);
+  };
+
+  const switchToConfig2 = () => {
+    setCurrentConfig(CONFIG_TWO);
+    setVoiceProviderKey(prevKey => prevKey + 1);
+    setAgents([
+      { active: true, text: 'Agent 1 Config 2' },
+      { active: false, text: 'Agent 2 Config 2' }
+    ]);
+  };
+
+  return (
+    <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
+      {!started && (
+        <div className="flex flex-col items-center justify-center h-full mt-[-5%]">
+          <div className="text-center">
+            <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
+            <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Consider This</h1>
+            <CustomTypingEffect
               lines={[
                 "Facilitate open discussions and gain diverse viewpoints with our AI Socratic Seminar platform."
               ]}
@@ -83,12 +109,8 @@ export default function ClientComponent({
               eraseDelay={2000}
               typingDelay={200}
               pauseDelay={4000}
-            /> */}
-            <div className="text-sm text-stone-400 mx-auto p-4 leading-loose">
-              Challenge what you know (and what you don't!) <br/> with our AI Socratic Seminar platform!
-            </div>
+            />
           </div>
-
           <div className="mt-8">
             <button
               onClick={handleStart}
@@ -98,39 +120,61 @@ export default function ClientComponent({
             </button>
           </div>
         </div>
-        )}
+      )}
 
-
-
-      {
-        started && conversationId && initialContext &&(
-          <VoiceProvider
-            sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
-            configId={configId}
-            auth={{ type: "accessToken", value: accessToken }}
-            onMessage={() => {
-              if (timeout.current) {
-                window.clearTimeout(timeout.current);
-              }
-
-              timeout.current = window.setTimeout(() => {
-                if (ref.current) {
-                  const scrollHeight = ref.current.scrollHeight;
-
-                  ref.current.scrollTo({
-                    top: scrollHeight,
-                    behavior: "smooth",
-                  });
+      {started && (
+        <>
+          <div className="flex flex-row space-x-4">
+            {agents.map((agent, index) => (
+              <div key={index} className="w-full md:w-1/2 p-2 pixelate bg-[#E6D7A5] border-4 border-[#915018] rounded-lg">
+                <AgentComponent
+                  active={agent.active}
+                  text={agent.text}
+                  onAgentClick={index === 0 ? switchToConfig2 : switchToConfig1}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="bg-[#E7D7A5] text-[#6C3F18] border-4 border-[#915018] p-4 m-4 rounded-md pixelate">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`mb-2 bg-[#F4EDD8] p-2 rounded-md border-2 border-[#915018] ${
+                  message.sender === 'You' ? 'text-right' : 'text-left'
+                }`}
+              >
+                <span className="font-bold">{message.sender}:</span> {message.text}
+              </div>
+            ))}
+          </div>
+          {started && conversationId && initialContext && (
+            <VoiceProvider
+              key={voiceProviderKey}
+              sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
+              configId={configId}
+              auth={{ type: "accessToken", value: accessToken }}
+              onMessage={() => {
+                if (timeout.current) {
+                  window.clearTimeout(timeout.current);
                 }
-              }, 200);
-            }}
-          >
-            <Messages ref={ref} conversationId={conversationId} />
-            <Controls conversationId={conversationId} configId={configId} setConfigId={setConfigId} setStarted={setStarted} client={client} />
-            <StartCall />
-          </VoiceProvider>
-        )
-      }
-    </div >
+                timeout.current = window.setTimeout(() => {
+                  if (ref.current) {
+                    const scrollHeight = ref.current.scrollHeight;
+                    ref.current.scrollTo({
+                      top: scrollHeight,
+                      behavior: "smooth",
+                    });
+                  }
+                }, 200);
+              }}
+            >
+              <Messages ref={ref} conversationId={conversationId} />
+              <Controls conversationId={conversationId} configId={configId} setConfigId={setConfigId} setStarted={setStarted} client={client} />
+              <StartCall />
+            </VoiceProvider>
+          )}
+        </>
+      )}
+    </div>
   );
 }
