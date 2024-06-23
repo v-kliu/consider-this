@@ -5,6 +5,8 @@ import { VoiceProvider } from "@humeai/voice-react";
 import ChatBox from "./ChatBox";
 import logo from './logos/socratesLogo.png';
 import CustomTypingEffect from './CustomTypingEffect';
+
+import { Footer } from "./Footer";
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
@@ -97,29 +99,34 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
   return (
     <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900 bg-[#F4EDD8]">
       {!started && (
-        <div className="flex flex-col items-center justify-center h-full mt-[-5%]">
-          <div className="text-center">
-            <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
-            <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Consider This</h1>
-            <CustomTypingEffect
-              lines={[
-                "Facilitate open discussions and gain diverse viewpoints with our AI Socratic Seminar platform."
-              ]}
-              speed={100}
-              eraseDelay={2000}
-              typingDelay={200}
-              pauseDelay={4000}
-            />
+
+        <>
+          <div className="flex flex-col items-center justify-center h-full mt-[-5%]">
+            <div className="text-center">
+              <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
+              <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Consider This</h1>
+              <CustomTypingEffect
+                lines={[
+                  "Facilitate open discussions and gain diverse viewpoints with our AI Socratic Seminar platform."
+                ]}
+                speed={100}
+                eraseDelay={2000}
+                typingDelay={200}
+                pauseDelay={4000}
+              />
+            </div>
+            <div className="mt-8">
+              <button
+                onClick={handleStart}
+                className="bg-[#ee8822] text-black py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#b3c8e3] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#a2b8d4] dark:hover:bg-[#90a7c5] font-bold transition-transform duration-150"
+              >
+                Start
+              </button>
+            </div>
           </div>
-          <div className="mt-8">
-            <button
-              onClick={handleStart}
-              className="bg-[#ee8822] text-black py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#b3c8e3] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#a2b8d4] dark:hover:bg-[#90a7c5] font-bold transition-transform duration-150"
-            >
-              Start
-            </button>
-          </div>
-        </div>
+          <Footer />
+        </>
+
       )}
 
       {started && (
