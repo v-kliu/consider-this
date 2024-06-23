@@ -3,31 +3,15 @@ import { cn } from "@/utils";
 import { useVoice } from "@humeai/voice-react";
 import Expressions from "./Expressions";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentRef, forwardRef, useEffect } from "react";
+import { ComponentRef, forwardRef, useEffect, useState } from "react";
 import { addMessageToConversation } from "@/utils/supabaseClient";
+import MessageLogger from "./MessageLogger";
 
 const Messages = forwardRef<
   ComponentRef<typeof motion.div>,
   { conversationId: string }
 >(function Messages({ conversationId }, ref) {
   const { messages } = useVoice();
-  
-  useEffect(() => {
-    const handleMessages = async () => {
-      for (let index = 0; index < messages.length; index++) {
-        const msg = messages[index];
-        if (msg.type === "user_message" || msg.type === "assistant_message") {
-          const { role, content } = msg.message;
-          const messageContent = role === "user" ? { from: role, from_content: content } : { to: role, to_content: content };
-
-          // Add or update the message in the conversation
-          await addMessageToConversation(conversationId, index, messageContent);
-        }
-      }
-    };
-
-    handleMessages();
-  }, [messages, conversationId]);
 
   return (
     <motion.div
@@ -44,9 +28,6 @@ const Messages = forwardRef<
               msg.type === "user_message" ||
               msg.type === "assistant_message"
             ) {
-              
-              // Store the message content and role in variables
-              const { role, content } = msg.message;
               
               return (
                 <motion.div
@@ -75,14 +56,14 @@ const Messages = forwardRef<
                       "text-xs capitalize font-medium leading-none opacity-50 pt-4 px-3"
                     )}
                   >
-                    {role}
+                    {msg.message.role}
                   </div>
-                  <div className={"pb-3 px-3"}>{content}</div>
+                  <div className={"pb-3 px-3"}>{msg.message.content}</div>
                   <Expressions values={msg.models.prosody?.scores ?? {}} />
+                  <MessageLogger role={msg.message.role} content={msg.message.content} conversationId={conversationId} messageIndex={index} />
                 </motion.div>
               );
             }
-
             return null;
           })}
         </AnimatePresence>

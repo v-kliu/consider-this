@@ -35,11 +35,6 @@ export default function ClientComponent({
       setConversationId(newConversationId);
       console.log('Conversation ID:', newConversationId);
 
-      // Add an empty message to the conversation
-      console.log('Adding empty message to the conversation...');
-      await addMessageToConversation(newConversationId, 0);
-      console.log('Empty message added successfully to the conversation');
-
     } catch (error) {
       console.error('Error handling conversation:', error);
     }

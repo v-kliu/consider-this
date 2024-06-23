@@ -15,3 +15,16 @@ export interface InsertConversationPayload {
   conversation: Conversation;
   participants: string[];
 }
+
+export interface Msg {
+  type: string;
+  message: {
+    role: string;
+    content: string;
+  };
+  models?: {
+    prosody?: {
+      scores?: Record<string, any>;
+    };
+  };
+}
