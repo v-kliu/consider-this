@@ -147,3 +147,22 @@ export const updateLastMessage = async (
     throw error;
   }
 };
+
+export const fetchConversationContextAndLastMessage = async (
+  conversationId: string
+): Promise<{ conversationContext: string; lastMessage: string }> => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select('conversation_context, last_message')
+    .eq('id', conversationId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    conversationContext: data.conversation_context,
+    lastMessage: data.last_message,
+  };
+};

@@ -6,6 +6,7 @@ export interface MessageContent {
   to_content?: string;
   to_attributes?: {};
   conversation_context?: string;
+  last_message?: string;
 }
 
 export interface Conversation {

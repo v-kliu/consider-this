@@ -8,7 +8,7 @@ import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import fetchConversationData from "@/utils/fetchConversationData";
-import { handleEndCall, updateFormattedConversation, updateLastMessage } from "@/utils/supabaseClient";
+import { fetchConversationContextAndLastMessage, handleEndCall, updateFormattedConversation, updateLastMessage } from "@/utils/supabaseClient";
 import { HumeClient } from "hume";
 
 interface ChatStageProps {
@@ -20,7 +20,7 @@ interface ChatStageProps {
 }
 
 const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConfigId, setStarted, client }) => {
-  const { connect, disconnect, status, isMuted, unmute, mute, micFft, lastVoiceMessage } = useVoice();
+  const { connect, disconnect, status, isMuted, unmute, mute, micFft, lastVoiceMessage, sendAssistantInput } = useVoice();
   const [conversation, setConversation] = useState<any>({});
 
   useEffect(() => {
@@ -40,6 +40,9 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
       await updateLastMessage(conversationId, lastVoiceMessage.message.content);
     }
 
+    // Fetch the conversation context and last message
+    const { conversationContext, lastMessage } = await fetchConversationContextAndLastMessage(conversationId);
+
     // Change the config ID (example: switch to a different config ID)
     const newConfigId = configId === '384018bf-9638-4236-a762-f45d589f2c00'
       ? '2abfaccf-24c6-4f82-976e-226a7e13583e' // Replace with actual new config ID
@@ -54,6 +57,8 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
     // });
 
     setStarted(true); // Continue the conversation
+
+    sendAssistantInput(conversationContext + lastMessage);
   };
 
   return (

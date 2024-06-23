@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, ComponentRef } from "react";
+import { useState, useRef, ComponentRef, useEffect } from "react";
 import { VoiceProvider } from "@humeai/voice-react";
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
 import { HumeClient } from "hume";
-import { ConversationData, addMessageToConversation, insertNewConversation } from "@/utils/supabaseClient";
+import { ConversationData, addMessageToConversation, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
 
 export default function ClientComponent({
   accessToken,
@@ -19,6 +19,19 @@ export default function ClientComponent({
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
   const [client, setClient] = useState<HumeClient | null>(null);
+  const [initialContext, setInitialContext] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (configId && conversationId) {
+      console.log("I'm fetching context!")
+      console.log(conversationId)
+      const fetchData = async () => {
+        const { conversationContext, lastMessage } = await fetchConversationContextAndLastMessage(conversationId);
+        setInitialContext(`${conversationContext}\n${lastMessage}`);
+      };
+      fetchData();
+    }
+  }, [configId, conversationId]);
 
   console.log("Chat:");
   console.log(configId);
@@ -86,8 +99,9 @@ export default function ClientComponent({
 
 
       {
-        started && conversationId && (
+        started && conversationId && initialContext &&(
           <VoiceProvider
+            sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
             configId={configId}
             auth={{ type: "accessToken", value: accessToken }}
             onMessage={() => {
