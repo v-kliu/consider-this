@@ -31,18 +31,19 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
         <div className="mt-40">
           {/* Project Description */}
           <div className="p-4 bg-gray-100 dark:bg-gray-800 text-center rounded-md mb-4 mx-auto w-3/4">
-            <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Project Luarnisplon</h1>
-            <p className="text-lg text-gray-700 dark:text-gray-300">
-              This project aims to provide seamless voice interaction through advanced AI technology.
-              Experience the next level of communication with our innovative platform.
+            <h1 className="text-2xl font-bold mb-2 text-black dark:text-gray-100">Consider-This</h1>
+            <p className="text-lg text-black dark:text-gray-300">
+              The AI Socratic Seminar project aims to facilitate open discussions and provide differing viewpoints, leveraging Hume's
+              empathetic model to foster understanding and empathy among participants. This innovative platform encourages meaningful
+              dialogue and the exchange of diverse perspectives.
             </p>
           </div>
 
           {/* Start Button */}
-          <div className="p-4 bg-gray-100 dark:bg-gray-800 text-center rounded-md mb-4 mx-auto w-3/4">
+          <div className="p-4 text-center rounded-md mb-4 mx-auto w-3/4">
             <button
               onClick={handleStart}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-800"
+                className="bg-[#ee8822] text-black py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#b3c8e3] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#a2b8d4] dark:hover:bg-[#90a7c5] font-bold transition-transform duration-150"
             >
               Start
             </button>
@@ -52,7 +53,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
 
       {started && (
         <>
-        {/* test ChatBox */}
+          {/* test ChatBox */}
           {/* <div className="flex-1 p-4">
             <div className="flex">
               <input

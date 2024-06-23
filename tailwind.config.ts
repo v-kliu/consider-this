@@ -8,11 +8,11 @@ const config = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     fontFamily: {
-      'sans': ['var(--font-geist-sans)', ...defaultTheme.fontFamily.sans],
+      'sans': ['VT323', ...defaultTheme.fontFamily.sans],
       'mono': ['var(--font-geist-mono)', ...defaultTheme.fontFamily.mono],
     },
     container: {

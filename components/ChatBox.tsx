@@ -11,7 +11,7 @@ interface ChatBoxProps {
 
 const ChatBox: React.FC<ChatBoxProps> = ({ messages }) => {
     return (
-        <div className="fixed bottom-0 left-0 right-0 h-1/3 bg-gray-100 dark:bg-gray-800 p-4 rounded-t-lg shadow-md overflow-y-auto">
+        <div className="fixed bottom-0 left-0 right-0 h-1/3 bg-[#6b4018] p-4 rounded-t-lg shadow-md overflow-y-auto">
             <div className="space-y-4">
                 {messages.map((msg, index) => (
                     <div key={index} className="p-2 rounded bg-gray-200 dark:bg-gray-700">

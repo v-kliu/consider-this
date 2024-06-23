@@ -29,7 +29,7 @@ export const Nav = () => {
   return (
     <div
       className={
-        "px-4 py-2 flex items-center h-14 z-50 bg-card border-b border-border"
+        "px-4 py-2 flex items-center h-14 z-50 bg-[#E7D7A5] border-b border-border"
       }
     >
       <div>
@@ -51,20 +51,6 @@ export const Nav = () => {
             <Github className={"size-4"} />
           </span>
           <span>Star on GitHub</span>
-        </Button>
-        <Button
-          onClick={toggleDark}
-          variant={"ghost"}
-          className={"ml-auto flex items-center gap-1.5"}
-        >
-          <span>
-            {isDarkMode ? (
-              <Sun className={"size-4"} />
-            ) : (
-              <Moon className={"size-4"} />
-            )}
-          </span>
-          <span>{isDarkMode ? "Light" : "Dark"} Mode</span>
         </Button>
       </div>
     </div>
