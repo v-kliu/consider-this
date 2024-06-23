@@ -4,11 +4,12 @@ import { useVoice } from "@humeai/voice-react";
 import Expressions from "./Expressions";
 import { AnimatePresence, motion } from "framer-motion";
 import { ComponentRef, forwardRef } from "react";
+import MessageLogger from "./MessageLogger";
 
 const Messages = forwardRef<
   ComponentRef<typeof motion.div>,
-  Record<never, never>
->(function Messages(_, ref) {
+  { conversationId: string }
+>(function Messages({ conversationId }, ref) {
   const { messages } = useVoice();
 
   return (
@@ -26,6 +27,7 @@ const Messages = forwardRef<
               msg.type === "user_message" ||
               msg.type === "assistant_message"
             ) {
+              
               return (
                 <motion.div
                   key={msg.type + index}
@@ -57,10 +59,10 @@ const Messages = forwardRef<
                   </div>
                   <div className={"pb-3 px-3"}>{msg.message.content}</div>
                   <Expressions values={msg.models.prosody?.scores ?? {}} />
+                  <MessageLogger role={msg.message.role} content={msg.message.content} attributes={msg.models.prosody?.scores ?? {}} conversationId={conversationId} messageIndex={index -2} />
                 </motion.div>
               );
             }
-
             return null;
           })}
         </AnimatePresence>
