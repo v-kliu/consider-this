@@ -1,14 +1,10 @@
 import 'server-only';
 import { fetchAccessToken } from "@humeai/voice";
-import { todo } from 'node:test';
 
 
 export const getHumeAccessToken = async (): Promise<string | null> => {
   const apiKey = process.env.HUME_API_KEY;
   const secretKey = process.env.HUME_CLIENT_SECRET;
-  // todo
-  // const configId = process.env.CONFIG_ONE;
-
 
   if (!apiKey || !secretKey) {
     console.error("HUME_API_KEY or HUME_CLIENT_SECRET is not defined");
@@ -19,7 +15,6 @@ export const getHumeAccessToken = async (): Promise<string | null> => {
     const accessToken = await fetchAccessToken({
       apiKey: apiKey as string,
       secretKey: secretKey as string,
-
     });
 
     return accessToken ?? null;

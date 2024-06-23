@@ -13,7 +13,7 @@ export default async function Page() {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden max-h-screen">
+    <div className={"grow flex flex-col"}>
       <Chat accessToken={accessToken} />
     </div>
   );

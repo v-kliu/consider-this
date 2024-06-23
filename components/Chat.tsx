@@ -1,29 +1,24 @@
 "use client";
 
-
 import { useState, useRef, ComponentRef, useEffect } from "react";
-
 import { VoiceProvider } from "@humeai/voice-react";
 import ChatBox from "./ChatBox";
-import logo from './images/socratesLogo.png';
+import logo from './logos/socratesLogo.png';
 import CustomTypingEffect from './CustomTypingEffect';
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
-
 import { HumeClient } from "hume";
-import { ConversationData, addMessageToConversation, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
+import { ConversationData, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
 import AgentComponent from "./Agent";
 
-
-// Initial config setup
 const CONFIG_ONE = "5a0c849f-bf21-4f9d-97f0-958ff8619fba";
 const CONFIG_TWO = "dbe866f5-2bb7-44df-a73c-846feb59f4ec";
 
 export default function ClientComponent({ accessToken }: { accessToken: string }) {
   const [started, setStarted] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9'); // Initial config ID
+  const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9');
   const [client, setClient] = useState<HumeClient | null>(null);
   const [initialContext, setInitialContext] = useState<string | null>(null);
   const [currentConfig, setCurrentConfig] = useState(CONFIG_ONE);
@@ -37,11 +32,8 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
-
   useEffect(() => {
     if (configId && conversationId) {
-      console.log("I'm fetching context!")
-      console.log(conversationId)
       const fetchData = async () => {
         const resultString = await fetchConversationContextAndLastMessage(conversationId);
         setInitialContext(resultString);
@@ -49,9 +41,6 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
       fetchData();
     }
   }, [configId, conversationId]);
-
-  console.log("Chat:");
-  console.log(configId);
 
   const handleStart = async () => {
     try {
@@ -63,21 +52,15 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
       const newConversationId = conversationData[0].id;
       setConversationId(newConversationId);
 
-      // Initialize Hume client
       const humeClient = new HumeClient({
         apiKey: process.env.HUME_API_KEY!,
         secretKey: process.env.HUME_CLIENT_SECRET!,
       });
       setClient(humeClient);
 
-      // const socket = await humeClient.empathicVoice.chat.connect({
-      //   configId,
-      // });
-
     } catch (error) {
       console.error('Error handling conversation:', error);
     }
-
 
     setStarted(true);
   };
@@ -116,9 +99,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
       {!started && (
         <div className="flex flex-col items-center justify-center h-full mt-[-5%]">
           <div className="text-center">
-            {/* Logo */}
             <img src={logo.src} alt="Logo" className="mx-auto mb-4" style={{ width: '125px', height: '125px' }} />
-
             <h1 className="text-4xl font-semibold mb-4 leading-relaxed text-black">Consider This</h1>
             <CustomTypingEffect
               lines={[
@@ -130,7 +111,6 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
               pauseDelay={4000}
             />
           </div>
-
           <div className="mt-8">
             <button
               onClick={handleStart}
@@ -155,8 +135,6 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
               </div>
             ))}
           </div>
-
-
           <div className="bg-[#E7D7A5] text-[#6C3F18] border-4 border-[#915018] p-4 m-4 rounded-md pixelate">
             {messages.map((message, index) => (
               <div
@@ -168,33 +146,33 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
                 <span className="font-bold">{message.sender}:</span> {message.text}
               </div>
             ))}
-
-{
-        started && conversationId && initialContext &&(
-          <VoiceProvider
-            key={voiceProviderKey}
-            sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
-            configId={configId}           
-            auth={{ type: "accessToken", value: accessToken }}
-            onMessage={() => {
-              if (timeout.current) {
-                window.clearTimeout(timeout.current);
-              }
-              timeout.current = window.setTimeout(() => {
-                if (ref.current) {
-                  const scrollHeight = ref.current.scrollHeight;
-                  ref.current.scrollTo({
-                    top: scrollHeight,
-                    behavior: "smooth",
-                  });
+          </div>
+          {started && conversationId && initialContext && (
+            <VoiceProvider
+              key={voiceProviderKey}
+              sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
+              configId={configId}
+              auth={{ type: "accessToken", value: accessToken }}
+              onMessage={() => {
+                if (timeout.current) {
+                  window.clearTimeout(timeout.current);
                 }
-              }, 200);
-            }}
-          >
-            <Messages ref={ref} conversationId={conversationId} />
-            <Controls conversationId={conversationId} configId={configId} setConfigId={setConfigId} setStarted={setStarted} client={client} />
-            <StartCall />
-          </VoiceProvider>
+                timeout.current = window.setTimeout(() => {
+                  if (ref.current) {
+                    const scrollHeight = ref.current.scrollHeight;
+                    ref.current.scrollTo({
+                      top: scrollHeight,
+                      behavior: "smooth",
+                    });
+                  }
+                }, 200);
+              }}
+            >
+              <Messages ref={ref} conversationId={conversationId} />
+              <Controls conversationId={conversationId} configId={configId} setConfigId={setConfigId} setStarted={setStarted} client={client} />
+              <StartCall />
+            </VoiceProvider>
+          )}
         </>
       )}
     </div>
