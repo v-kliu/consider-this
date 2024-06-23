@@ -93,9 +93,26 @@ export const updateFormattedConversation = async (
   conversationId: string,
   formattedConversation: string
 ): Promise<ConversationData[]> => {
+  // Fetch the current conversation context
+  const { data: currentData, error: fetchError } = await supabase
+    .from('conversations')
+    .select('conversation_context')
+    .eq('id', conversationId)
+    .single();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
+  // Append the formatted conversation to the conversation_context
+  const updatedContext = (currentData.conversation_context || '') + '\n' + formattedConversation;
+
   const { data, error } = await supabase
     .from('conversations')
-    .update({ conversation: formattedConversation })
+    .update({
+      conversation: {}, // Clear the conversation column
+      conversation_context: updatedContext
+    })
     .eq('id', conversationId)
     .select();
 
