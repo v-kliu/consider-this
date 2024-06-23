@@ -1,6 +1,8 @@
 "use client";
 
-import { ComponentRef, useRef, useState } from "react";
+
+import { useState, useRef, ComponentRef, useEffect } from "react";
+
 import { VoiceProvider } from "@humeai/voice-react";
 import ChatBox from "./ChatBox";
 import logo from './images/socratesLogo.png';
@@ -8,7 +10,11 @@ import CustomTypingEffect from './CustomTypingEffect';
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
+
+import { HumeClient } from "hume";
+import { ConversationData, addMessageToConversation, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
 import AgentComponent from "./Agent";
+
 
 // Initial config setup
 const CONFIG_ONE = "5a0c849f-bf21-4f9d-97f0-958ff8619fba";
@@ -16,18 +22,63 @@ const CONFIG_TWO = "dbe866f5-2bb7-44df-a73c-846feb59f4ec";
 
 export default function ClientComponent({ accessToken }: { accessToken: string }) {
   const [started, setStarted] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9'); // Initial config ID
+  const [client, setClient] = useState<HumeClient | null>(null);
+  const [initialContext, setInitialContext] = useState<string | null>(null);
   const [currentConfig, setCurrentConfig] = useState(CONFIG_ONE);
   const [voiceProviderKey, setVoiceProviderKey] = useState(0);
-  const timeout = useRef<number | null>(null);
-  const ref = useRef<ComponentRef<typeof Messages> | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([{ sender: 'Alice', text: 'Hello, how are you?' }]);
   const [agents, setAgents] = useState([
     { active: true, text: 'Agent 1' },
     { active: false, text: 'Agent 2' }
   ]);
+  const timeout = useRef<number | null>(null);
+  const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
-  const handleStart = () => {
+
+  useEffect(() => {
+    if (configId && conversationId) {
+      console.log("I'm fetching context!")
+      console.log(conversationId)
+      const fetchData = async () => {
+        const resultString = await fetchConversationContextAndLastMessage(conversationId);
+        setInitialContext(resultString);
+      };
+      fetchData();
+    }
+  }, [configId, conversationId]);
+
+  console.log("Chat:");
+  console.log(configId);
+
+  const handleStart = async () => {
+    try {
+      const conversationData: ConversationData[] = await insertNewConversation();
+      if (!conversationData || conversationData.length === 0) {
+        throw new Error("Failed to insert new conversation");
+      }
+
+      const newConversationId = conversationData[0].id;
+      setConversationId(newConversationId);
+
+      // Initialize Hume client
+      const humeClient = new HumeClient({
+        apiKey: process.env.HUME_API_KEY!,
+        secretKey: process.env.HUME_CLIENT_SECRET!,
+      });
+      setClient(humeClient);
+
+      // const socket = await humeClient.empathicVoice.chat.connect({
+      //   configId,
+      // });
+
+    } catch (error) {
+      console.error('Error handling conversation:', error);
+    }
+
+
     setStarted(true);
   };
 
@@ -105,6 +156,7 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
             ))}
           </div>
 
+
           <div className="bg-[#E7D7A5] text-[#6C3F18] border-4 border-[#915018] p-4 m-4 rounded-md pixelate">
             {messages.map((message, index) => (
               <div
@@ -116,25 +168,13 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
                 <span className="font-bold">{message.sender}:</span> {message.text}
               </div>
             ))}
-            {/* <div className="flex mt-2">
-              <input
-                className="flex-grow p-2 border-2 border-[#915018] rounded-md pixelate bg-[#FFF] text-[#6C3F18]"
-                type="text"
-                value={newMessage}
-                onChange={handleNewMessageChange}
-                placeholder="Type your message..."
-              />
-              <button
-                className="bg-[#F1602C] text-white py-2 px-4 rounded-sm border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1),8px_8px_0px_rgba(0,0,0,0.25)] hover:bg-[#D52429] hover:shadow-[2px_2px_0px_rgba(0,0,0,1),4px_4px_0px_rgba(0,0,0,0.25)] hover:translate-x-1 hover:translate-y-1 dark:bg-[#915018] dark:hover:bg-[#6C3F18] font-bold transition-transform duration-150 pixelate"
-                onClick={handleSendMessage}
-              >
-                Send
-              </button>
-            </div> */}
-          </div>
+
+{
+        started && conversationId && initialContext &&(
           <VoiceProvider
             key={voiceProviderKey}
-            configId={currentConfig}
+            sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
+            configId={configId}           
             auth={{ type: "accessToken", value: accessToken }}
             onMessage={() => {
               if (timeout.current) {
@@ -151,8 +191,8 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
               }, 200);
             }}
           >
-            <Messages ref={ref} />
-            <Controls />
+            <Messages ref={ref} conversationId={conversationId} />
+            <Controls conversationId={conversationId} configId={configId} setConfigId={setConfigId} setStarted={setStarted} client={client} />
             <StartCall />
           </VoiceProvider>
         </>

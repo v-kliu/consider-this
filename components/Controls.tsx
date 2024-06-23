@@ -6,9 +6,60 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Toggle } from "./ui/toggle";
 import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
+import { useEffect, useState } from "react";
+import fetchConversationData from "@/utils/fetchConversationData";
+import { fetchConversationContextAndLastMessage, handleEndCall, updateLastMessage } from "@/utils/supabaseClient";
+import { HumeClient } from "hume";
 
-export default function Controls() {
-  const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+interface ChatStageProps {
+  conversationId: string;
+  configId: string;
+  setConfigId: (configId: string) => void;
+  setStarted: (started: boolean) => void;
+  client: HumeClient | null;
+}
+
+const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConfigId, setStarted, client }) => {
+  const { connect, disconnect, status, isMuted, unmute, mute, micFft, lastVoiceMessage, sendAssistantInput } = useVoice();
+  const [conversation, setConversation] = useState<any>({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const conversationData = await fetchConversationData(conversationId);
+      setConversation(conversationData);
+    };
+
+    fetchData();
+  }, [conversationId]);
+
+  const handleSwitchPersona = async () => {
+    await handleEndCall(conversationId, disconnect);
+
+    // Update the last_message column with the lastVoiceMessage value
+    if (lastVoiceMessage) {
+      await updateLastMessage(conversationId, lastVoiceMessage.message.content);
+    }
+
+    // Fetch the conversation context and last message
+    const returnString = await fetchConversationContextAndLastMessage(conversationId);
+
+    // Change the config ID (example: switch to a different config ID)
+    const newConfigId = configId === 'dabbd347-11ff-46a6-9a94-4117b1f7ccf9'
+      ? '44c49487-cd42-48af-bf68-94daf79185cd' // Replace with actual new config ID
+      : 'dabbd347-11ff-46a6-9a94-4117b1f7ccf9';
+
+    setConfigId(newConfigId);
+    setStarted(false); // Restart the conversation
+
+    // Reconnect with the new config ID
+    // await client?.empathicVoice.chat.connect({
+    //   configId: newConfigId,
+    // });
+
+    setStarted(true); // Continue the conversation
+
+    sendAssistantInput(returnString);
+  };
 
   return (
     <div
@@ -61,9 +112,7 @@ export default function Controls() {
 
             <Button
               className={"flex items-center gap-1"}
-              onClick={() => {
-                disconnect();
-              }}
+              onClick={() => handleEndCall(conversationId, disconnect)}
               variant={"destructive"}
             >
               <span>
@@ -75,9 +124,25 @@ export default function Controls() {
               </span>
               <span>End Call</span>
             </Button>
+            <Button
+              className={"flex items-center gap-1"}
+              onClick={handleSwitchPersona}
+              variant={"destructive"}
+            >
+              <span>
+                <Phone
+                  className={"size-4 opacity-50"}
+                  strokeWidth={2}
+                  stroke={"currentColor"}
+                />
+              </span>
+              <span>Switch Personas</span>
+            </Button>
           </motion.div>
         ) : null}
       </AnimatePresence>
     </div>
   );
 }
+
+export default ChatStage;
