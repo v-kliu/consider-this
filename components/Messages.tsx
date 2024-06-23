@@ -9,7 +9,7 @@ const Messages = forwardRef<
   ComponentRef<typeof motion.div>,
   Record<never, never>
 >(function Messages(_, ref) {
-  const { messages } = useVoice();
+  const { messages } = useVoice();  
 
   return (
     <motion.div
