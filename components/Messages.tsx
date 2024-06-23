@@ -3,13 +3,31 @@ import { cn } from "@/utils";
 import { useVoice } from "@humeai/voice-react";
 import Expressions from "./Expressions";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentRef, forwardRef } from "react";
+import { ComponentRef, forwardRef, useEffect } from "react";
+import { addMessageToConversation } from "@/utils/supabaseClient";
 
 const Messages = forwardRef<
   ComponentRef<typeof motion.div>,
-  Record<never, never>
->(function Messages(_, ref) {
+  { conversationId: string }
+>(function Messages({ conversationId }, ref) {
   const { messages } = useVoice();
+  
+  useEffect(() => {
+    const handleMessages = async () => {
+      for (let index = 0; index < messages.length; index++) {
+        const msg = messages[index];
+        if (msg.type === "user_message" || msg.type === "assistant_message") {
+          const { role, content } = msg.message;
+          const messageContent = role === "user" ? { from: role, from_content: content } : { to: role, to_content: content };
+
+          // Add or update the message in the conversation
+          await addMessageToConversation(conversationId, index, messageContent);
+        }
+      }
+    };
+
+    handleMessages();
+  }, [messages, conversationId]);
 
   return (
     <motion.div

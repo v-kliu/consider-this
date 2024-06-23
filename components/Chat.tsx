@@ -5,7 +5,6 @@ import { VoiceProvider } from "@humeai/voice-react";
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
-import { MessageContent } from "@/types/types";
 import { ConversationData, addMessageToConversation, insertNewConversation } from "@/utils/supabaseClient";
 
 export default function ClientComponent({
@@ -14,6 +13,7 @@ export default function ClientComponent({
   accessToken: string;
 }) {
   const [started, setStarted] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
 
@@ -31,34 +31,14 @@ export default function ClientComponent({
 
       // Get the conversation ID
       console.log('Getting conversation ID...');
-      const conversationId = conversationData[0].id;
-      console.log('Conversation ID:', conversationId);
+      const newConversationId = conversationData[0].id;
+      setConversationId(newConversationId);
+      console.log('Conversation ID:', newConversationId);
 
       // Add an empty message to the conversation
       console.log('Adding empty message to the conversation...');
-      await addMessageToConversation(conversationId, 0);
+      await addMessageToConversation(newConversationId, 0);
       console.log('Empty message added successfully to the conversation');
-
-      // Define partial message content to update
-      const message1: Partial<MessageContent> = {
-        from: "Lucas",
-        from_content: "I love you!",
-        from_attributes: "heartfelt, excited, happy",
-      };
-
-      const message2: Partial<MessageContent> = {
-        to: "Victor",
-        to_content: "That's crazy dawg",
-        to_attributes: "confused, amused, entertained",
-      };
-
-      // Update the messages in the conversation
-      await addMessageToConversation(conversationId, 0, message1);
-      await addMessageToConversation(conversationId, 0, message2);
-      await addMessageToConversation(conversationId, 1, message1);
-      await addMessageToConversation(conversationId, 1, message2);
-
-      console.log('Messages added successfully to the conversation');
 
     } catch (error) {
       console.error('Error handling conversation:', error);
@@ -102,7 +82,7 @@ export default function ClientComponent({
 
 
       {
-        started && (
+        started && conversationId && (
           <VoiceProvider
             auth={{ type: "accessToken", value: accessToken }}
             onMessage={() => {
@@ -122,7 +102,7 @@ export default function ClientComponent({
               }, 200);
             }}
           >
-            <Messages ref={ref} />
+            <Messages ref={ref} conversationId={conversationId} />
             <Controls />
             <StartCall />
           </VoiceProvider>
