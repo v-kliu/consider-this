@@ -1,7 +1,9 @@
-"use client";
+"use client"; // Add this line at the top
 
-import { SetStateAction, useState } from "react";
+import React from "react";
+import { useState } from "react";
 import ChatBox from "./ChatBox";
+import Agent from "./Agent";
 
 export default function ClientComponent({ accessToken }: { accessToken: string; }) {
   const [started, setStarted] = useState(false);
@@ -9,12 +11,28 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
   const [messages, setMessages] = useState([
     { sender: 'Alice', text: 'Hello, how are you?' },
   ]);
+  const [agentOneData, setAgentOneData] = useState([
+    {
+      initialActive: true,
+      initialReveal: true,
+      initialIdea: true,
+      text: 'Agent 1',
+    }
+  ]);
+  const [agentTwoData, setAgentTwoData] = useState([
+    {
+      initialActive: false,
+      initialReveal: false,
+      initialIdea: false,
+      text: 'Agent 2',
+    }
+  ]);
 
   const handleStart = () => {
     setStarted(true);
   };
 
-  const handleNewMessageChange = (e: { target: { value: SetStateAction<string>; }; }) => {
+  const handleNewMessageChange = (e: { target: { value: string; }; }) => {
     setNewMessage(e.target.value);
   };
 
@@ -25,8 +43,12 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
     }
   };
 
+  const handleAgentReveal = () => {
+    console.log("MODIFY THIS TO BE API CALL")
+  };
+
   return (
-    <div className="relative grow flex flex-col mx-auto w-full overflow-hidden h-screen dark:bg-gray-900">
+    <div className="relative grow flex flex-col mx-auto w-full h-screen overflow-hidden dark:bg-gray-900">
       {!started && (
         <div className="mt-40">
           {/* Project Description */}
@@ -53,25 +75,36 @@ export default function ClientComponent({ accessToken }: { accessToken: string; 
 
       {started && (
         <>
-          {/* test ChatBox */}
-          {/* <div className="flex-1 p-4">
-            <div className="flex">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={handleNewMessageChange}
-                className="flex-1 p-2 border-2 border-gray-200 rounded-md"
-                placeholder="Type your message here..."
-              />
-              <button
-                onClick={handleSendMessage}
-                className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-              >
-                Send
-              </button>
-            </div>
-          </div> */}
+          {/* ChatBox */}
           <ChatBox messages={messages} />
+
+          {/* Agents */}
+          <div className="flex flex-row space-x-4">
+            <div className="w-full md:w-1/2 p-2">
+              {agentOneData.map((agent, index) => (
+                <Agent
+                  key={index}
+                  initialActive={agent.initialActive}
+                  initialReveal={agent.initialReveal}
+                  initialIdea={agent.initialIdea}
+                  text={agent.text}
+                  agentOneReveal={handleAgentReveal}
+                />
+              ))}
+            </div>
+            <div className="w-full md:w-1/2 p-2">
+              {agentTwoData.map((agent, index) => (
+                <Agent
+                  key={index}
+                  initialActive={agent.initialActive}
+                  initialReveal={agent.initialReveal}
+                  initialIdea={agent.initialIdea}
+                  text={agent.text}
+                  agentOneReveal={handleAgentReveal}
+                />
+              ))}
+            </div>
+          </div>
         </>
       )}
     </div>
