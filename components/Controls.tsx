@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import fetchConversationData from "@/utils/fetchConversationData";
 import { fetchConversationContextAndLastMessage, handleEndCall, updateLastMessage } from "@/utils/supabaseClient";
 import { HumeClient } from "hume";
+import AgentComponent from "./Agent";
 
 interface ChatStageProps {
   conversationId: string;
@@ -22,6 +23,28 @@ interface ChatStageProps {
 const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConfigId, setStarted, client }) => {
   const { connect, disconnect, status, isMuted, unmute, mute, micFft, lastVoiceMessage, sendAssistantInput } = useVoice();
   const [conversation, setConversation] = useState<any>({});
+  const [agents, setAgents] = useState([
+    { active: true, text: 'Agent 1' },
+    { active: false, text: 'Agent 2' }
+  ]);
+
+  const switchToConfig1 = () => {
+    handleSwitchPersona();
+    setAgents([
+      { active: false, text: 'Agent 1 Config 1' },
+      { active: true, text: 'Agent 2 Config 1' }
+    ]);
+  };
+
+  const switchToConfig2 = () => {
+    handleSwitchPersona();
+    setAgents([
+      { active: true, text: 'Agent 1 Config 2' },
+      { active: false, text: 'Agent 2 Config 2' }
+    ]);
+
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,9 +86,26 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
     } catch (error) {
       console.error("Error sending assistant input:", error);
     }
+    connect()
+          .then(() => { })
+          .catch(() => { })
+          .finally(() => { });
+    
   };
 
   return (
+    <div>
+      <div className="flex flex-row space-x-4">
+        {agents.map((agent, index) => (
+          <div key={index} className="w-full md:w-1/2 p-2 pixelate bg-[#E6D7A5] border-4 border-[#915018] rounded-lg">
+            <AgentComponent
+              active={agent.active}
+              text={agent.text}
+              onAgentClick={index === 0 ? switchToConfig2 : switchToConfig1}
+            />
+          </div>
+        ))}
+      </div>
     <div
       className={
         cn(
@@ -145,6 +185,7 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
           </motion.div>
         ) : null}
       </AnimatePresence>
+      </div>
     </div>
   );
 }
