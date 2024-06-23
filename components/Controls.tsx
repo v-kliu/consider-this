@@ -8,14 +8,18 @@ import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import fetchConversationData from "@/utils/fetchConversationData";
-import formatConversation from "@/utils/formatConversation";
-import { updateFormattedConversation } from "@/utils/supabaseClient";
+import { handleEndCall, updateFormattedConversation } from "@/utils/supabaseClient";
+import { HumeClient } from "hume";
 
 interface ChatStageProps {
   conversationId: string;
+  configId: string;
+  setConfigId: (configId: string) => void;
+  setStarted: (started: boolean) => void;
+  client: HumeClient | null;
 }
 
-const ChatStage: React.FC<ChatStageProps> = ({ conversationId }) => {
+const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConfigId, setStarted, client }) => {
   const { connect, disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
   const [conversation, setConversation] = useState<any>({});
 
@@ -28,18 +32,23 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId }) => {
     fetchData();
   }, [conversationId]);
 
-  const handleEndCall = async () => {
-    const conversationData = await fetchConversationData(conversationId);
-    const formattedConversation = formatConversation(conversationData);
-    console.log('Formatted Conversation:', formattedConversation); // For debugging
+  const handleSwitchPersona = async () => {
+    await handleEndCall(conversationId, disconnect);
 
-    // Replace the conversation with the reformatted version (if needed)
-    setConversation(formattedConversation);
+    // Change the config ID (example: switch to a different config ID)
+    const newConfigId = configId === '384018bf-9638-4236-a762-f45d589f2c00'
+      ? '2abfaccf-24c6-4f82-976e-226a7e13583e' // Replace with actual new config ID
+      : '384018bf-9638-4236-a762-f45d589f2c00';
 
-    // Update the conversation in Supabase
-    await updateFormattedConversation(conversationId, formattedConversation);
+    setConfigId(newConfigId);
+    setStarted(false); // Restart the conversation
 
-    disconnect();
+    // Reconnect with the new config ID
+    // await client?.empathicVoice.chat.connect({
+    //   configId: newConfigId,
+    // });
+
+    setStarted(true); // Continue the conversation
   };
 
   return (
@@ -93,7 +102,7 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId }) => {
 
             <Button
               className={"flex items-center gap-1"}
-              onClick={handleEndCall}
+              onClick={() => handleEndCall(conversationId, disconnect)}
               variant={"destructive"}
             >
               <span>
@@ -104,6 +113,20 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId }) => {
                 />
               </span>
               <span>End Call</span>
+            </Button>
+            <Button
+              className={"flex items-center gap-1"}
+              onClick={handleSwitchPersona}
+              variant={"destructive"}
+            >
+              <span>
+                <Phone
+                  className={"size-4 opacity-50"}
+                  strokeWidth={2}
+                  stroke={"currentColor"}
+                />
+              </span>
+              <span>Switch Personas</span>
             </Button>
           </motion.div>
         ) : null}

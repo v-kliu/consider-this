@@ -5,6 +5,7 @@ import { VoiceProvider } from "@humeai/voice-react";
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
+import { HumeClient } from "hume";
 import { ConversationData, addMessageToConversation, insertNewConversation } from "@/utils/supabaseClient";
 
 export default function ClientComponent({
@@ -14,26 +15,34 @@ export default function ClientComponent({
 }) {
   const [started, setStarted] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [configId, setConfigId] = useState<string>('384018bf-9638-4236-a762-f45d589f2c00'); // Initial config ID
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
+  const [client, setClient] = useState<HumeClient | null>(null);
+
+  console.log("Chat:");
+  console.log(configId);
 
   const handleStart = async () => {
     try {
-      // Insert a new conversation
-      console.log('Inserting new conversation...');
-
       const conversationData: ConversationData[] = await insertNewConversation();
       if (!conversationData || conversationData.length === 0) {
         throw new Error("Failed to insert new conversation");
       }
 
-      console.log('New conversation inserted successfully:', conversationData);
-
-      // Get the conversation ID
-      console.log('Getting conversation ID...');
       const newConversationId = conversationData[0].id;
       setConversationId(newConversationId);
-      console.log('Conversation ID:', newConversationId);
+
+      // Initialize Hume client
+      const humeClient = new HumeClient({
+        apiKey: process.env.HUME_API_KEY!,
+        secretKey: process.env.HUME_CLIENT_SECRET!,
+      });
+      setClient(humeClient);
+
+      // const socket = await humeClient.empathicVoice.chat.connect({
+      //   configId,
+      // });
 
     } catch (error) {
       console.error('Error handling conversation:', error);
@@ -79,6 +88,7 @@ export default function ClientComponent({
       {
         started && conversationId && (
           <VoiceProvider
+            configId={configId}
             auth={{ type: "accessToken", value: accessToken }}
             onMessage={() => {
               if (timeout.current) {
@@ -98,7 +108,7 @@ export default function ClientComponent({
             }}
           >
             <Messages ref={ref} conversationId={conversationId} />
-            <Controls conversationId={conversationId} />
+            <Controls conversationId={conversationId} configId={configId} setConfigId={setConfigId} setStarted={setStarted} client={client} />
             <StartCall />
           </VoiceProvider>
         )

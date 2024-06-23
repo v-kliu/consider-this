@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import fetchConversationData from './fetchConversationData';
+import formatConversation from './formatConversation';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
@@ -101,4 +103,16 @@ export const updateFormattedConversation = async (
     throw error;
   }
   return data as ConversationData[];
+};
+
+export const handleEndCall = async (conversationId: string, disconnect: () => void) => {
+  const conversationData = await fetchConversationData(conversationId);
+  const formattedConversation = formatConversation(conversationData);
+  console.log('Formatted Conversation:', formattedConversation); // For debugging
+
+  // Update the conversation in Supabase
+  await updateFormattedConversation(conversationId, formattedConversation);
+
+  // Call the disconnect function
+  disconnect();
 };
