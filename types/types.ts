@@ -1,10 +1,10 @@
 export interface MessageContent {
   from?: string;
   from_content?: string;
-  from_attributes?: string;
+  from_attributes?: {};
   to?: string;
   to_content?: string;
-  to_attributes?: string;
+  to_attributes?: {};
 }
 
 export interface Conversation {

@@ -3,8 +3,7 @@ import { cn } from "@/utils";
 import { useVoice } from "@humeai/voice-react";
 import Expressions from "./Expressions";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentRef, forwardRef, useEffect, useState } from "react";
-import { addMessageToConversation } from "@/utils/supabaseClient";
+import { ComponentRef, forwardRef } from "react";
 import MessageLogger from "./MessageLogger";
 
 const Messages = forwardRef<
@@ -60,7 +59,7 @@ const Messages = forwardRef<
                   </div>
                   <div className={"pb-3 px-3"}>{msg.message.content}</div>
                   <Expressions values={msg.models.prosody?.scores ?? {}} />
-                  <MessageLogger role={msg.message.role} content={msg.message.content} conversationId={conversationId} messageIndex={index} />
+                  <MessageLogger role={msg.message.role} content={msg.message.content} attributes={msg.models.prosody?.scores ?? {}} conversationId={conversationId} messageIndex={index} />
                 </motion.div>
               );
             }
