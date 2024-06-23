@@ -6,9 +6,41 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Toggle } from "./ui/toggle";
 import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
+import { useEffect, useState } from "react";
+import fetchConversationData from "@/utils/fetchConversationData";
+import formatConversation from "@/utils/formatConversation";
+import { updateFormattedConversation } from "@/utils/supabaseClient";
 
-export default function Controls() {
-  const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+interface ChatStageProps {
+  conversationId: string;
+}
+
+const ChatStage: React.FC<ChatStageProps> = ({ conversationId }) => {
+  const { connect, disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+  const [conversation, setConversation] = useState<any>({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const conversationData = await fetchConversationData(conversationId);
+      setConversation(conversationData);
+    };
+
+    fetchData();
+  }, [conversationId]);
+
+  const handleEndCall = async () => {
+    const conversationData = await fetchConversationData(conversationId);
+    const formattedConversation = formatConversation(conversationData);
+    console.log('Formatted Conversation:', formattedConversation); // For debugging
+
+    // Replace the conversation with the reformatted version (if needed)
+    setConversation(formattedConversation);
+
+    // Update the conversation in Supabase
+    await updateFormattedConversation(conversationId, formattedConversation);
+
+    disconnect();
+  };
 
   return (
     <div
@@ -61,9 +93,7 @@ export default function Controls() {
 
             <Button
               className={"flex items-center gap-1"}
-              onClick={() => {
-                disconnect();
-              }}
+              onClick={handleEndCall}
               variant={"destructive"}
             >
               <span>
@@ -81,3 +111,5 @@ export default function Controls() {
     </div>
   );
 }
+
+export default ChatStage;

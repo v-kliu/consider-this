@@ -98,7 +98,7 @@ export default function ClientComponent({
             }}
           >
             <Messages ref={ref} conversationId={conversationId} />
-            <Controls />
+            <Controls conversationId={conversationId} />
             <StartCall />
           </VoiceProvider>
         )

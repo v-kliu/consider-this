@@ -15,18 +15,18 @@ interface MessageLoggerProps {
 const MessageLogger = ({ role, content, conversationId, messageIndex, attributes }: MessageLoggerProps) => {
   useEffect(() => {
 
-    const top3 = R.pipe(
-        attributes,
-        R.entries(),
-        R.sortBy(R.pathOr([1], 0)),
-        R.reverse(),
-        R.take(3)
-      );
+    const top3Dict = R.pipe(
+      attributes,
+      R.entries(),
+      R.sortBy(R.pathOr([1], 0)),
+      R.reverse(),
+      R.take(3),
+      R.reduce((acc, [key, value]) => {
+        acc[key] = value.toFixed(2); // Format to 2 significant figures and convert to string
+        return acc;
+      }, {} as Record<string, string>)
+    );
 
-    const top3Dict = top3.reduce((acc, [key, value]) => {
-    acc[key] = value;
-    return acc;
-    }, {} as Record<string, number>);
 
     const updateMessage = async () => {
       if (role && content) {

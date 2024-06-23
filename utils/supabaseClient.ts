@@ -1,5 +1,3 @@
-// supabaseUtils.ts
-import { InsertConversationPayload, MessageContent } from '@/types/types';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
@@ -11,8 +9,26 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+export interface MessageAttributes {
+  [key: string]: string;
+}
+
+export interface MessageContent {
+  from?: string;
+  from_content?: string;
+  from_attributes?: MessageAttributes;
+  to?: string;
+  to_content?: string;
+  to_attributes?: MessageAttributes;
+}
+
 export interface ConversationData {
   id: string;
+  conversation: { [key: number]: MessageContent };
+  participants: string[];
+}
+
+export interface InsertConversationPayload {
   conversation: { [key: number]: MessageContent };
   participants: string[];
 }
@@ -62,6 +78,22 @@ export const addMessageToConversation = async (
   const { data, error } = await supabase
     .from('conversations')
     .update({ conversation: updatedConversation })
+    .eq('id', conversationId)
+    .select();
+
+  if (error) {
+    throw error;
+  }
+  return data as ConversationData[];
+};
+
+export const updateFormattedConversation = async (
+  conversationId: string,
+  formattedConversation: string
+): Promise<ConversationData[]> => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .update({ conversation: formattedConversation })
     .eq('id', conversationId)
     .select();
 
