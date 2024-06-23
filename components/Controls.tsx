@@ -30,20 +30,20 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
 
   const switchToConfig1 = () => {
     handleSwitchPersona();
-    setAgents([
-      { active: false, text: 'Agent 1 Config 1' },
-      { active: true, text: 'Agent 2 Config 1' }
-    ]);
+    if (configId === "5a0c849f-bf21-4f9d-97f0-958ff8619fba") {
+      setAgents([
+        { active: false, text: 'Agent 1 Config 1' },
+        { active: true, text: 'Agent 2 Config 1' }
+      ]);
+    } else {
+      setAgents([
+        { active: true, text: 'Agent 1 Config 2' },
+        { active: false, text: 'Agent 2 Config 2' }
+      ]);
+    }
+
   };
 
-  const switchToConfig2 = () => {
-    handleSwitchPersona();
-    setAgents([
-      { active: true, text: 'Agent 1 Config 2' },
-      { active: false, text: 'Agent 2 Config 2' }
-    ]);
-
-  };
 
 
   useEffect(() => {
@@ -67,9 +67,11 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
     const returnString = await fetchConversationContextAndLastMessage(conversationId);
 
     // Change the config ID (example: switch to a different config ID)
-    const newConfigId = configId === 'dabbd347-11ff-46a6-9a94-4117b1f7ccf9'
-      ? '44c49487-cd42-48af-bf68-94daf79185cd' // Replace with actual new config ID
-      : 'dabbd347-11ff-46a6-9a94-4117b1f7ccf9';
+    const newConfigId = configId === 'dbe866f5-2bb7-44df-a73c-846feb59f4ec'
+      ? '5a0c849f-bf21-4f9d-97f0-958ff8619fba' // Replace with actual new config ID
+      : 'dbe866f5-2bb7-44df-a73c-846feb59f4ec';
+
+    console.log(newConfigId);
 
     setConfigId(newConfigId);
     setStarted(false); // Restart the conversation
@@ -84,13 +86,13 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
     try {
       sendAssistantInput(returnString);
     } catch (error) {
-      console.error("Error sending assistant input:", error);
+      console.error("Error sending assistant input:");
     }
+
     connect()
-          .then(() => { })
-          .catch(() => { })
-          .finally(() => { });
-    
+      .then(() => { })
+      .catch(() => { })
+      .finally(() => { });
   };
 
   return (
@@ -101,91 +103,91 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
             <AgentComponent
               active={agent.active}
               text={agent.text}
-              onAgentClick={index === 0 ? switchToConfig2 : switchToConfig1}
+              onAgentClick={switchToConfig1}
             />
           </div>
         ))}
       </div>
-    <div
-      className={
-        cn(
-          "fixed bottom-0 left-0 w-full p-4 flex items-center justify-center",
-          "bg-gradient-to-t from-card via-card/90 to-card/0",
-        )
-      }
-    >
-      <AnimatePresence>
-        {status.value === "connected" ? (
-          <motion.div
-            initial={{
-              y: "100%",
-              opacity: 0,
-            }}
-            animate={{
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              y: "100%",
-              opacity: 0,
-            }}
-            className={
-              "p-4 bg-card border border-border rounded-lg shadow-sm flex items-center gap-4"
-            }
-          >
-            <Toggle
-              pressed={!isMuted}
-              onPressedChange={() => {
-                if (isMuted) {
-                  unmute();
-                } else {
-                  mute();
-                }
+      {/* <div
+        className={
+          cn(
+            "fixed bottom-0 left-0 w-full p-4 flex items-center justify-center",
+            "bg-gradient-to-t from-card via-card/90 to-card/0",
+          )
+        }
+      >
+        <AnimatePresence>
+          {status.value === "connected" ? (
+            <motion.div
+              initial={{
+                y: "100%",
+                opacity: 0,
               }}
+              animate={{
+                y: 0,
+                opacity: 1,
+              }}
+              exit={{
+                y: "100%",
+                opacity: 0,
+              }}
+              className={
+                "p-4 bg-card border border-border rounded-lg shadow-sm flex items-center gap-4"
+              }
             >
-              {isMuted ? (
-                <MicOff className={"size-4"} />
-              ) : (
-                <Mic className={"size-4"} />
-              )}
-            </Toggle>
+              <Toggle
+                pressed={!isMuted}
+                onPressedChange={() => {
+                  if (isMuted) {
+                    unmute();
+                  } else {
+                    mute();
+                  }
+                }}
+              >
+                {isMuted ? (
+                  <MicOff className={"size-4"} />
+                ) : (
+                  <Mic className={"size-4"} />
+                )}
+              </Toggle>
 
-            <div className={"relative grid h-8 w-48 shrink grow-0"}>
-              <MicFFT fft={micFft} className={"fill-current"} />
-            </div>
+              <div className={"relative grid h-8 w-48 shrink grow-0"}>
+                <MicFFT fft={micFft} className={"fill-current"} />
+              </div>
 
-            <Button
-              className={"flex items-center gap-1"}
-              onClick={() => handleEndCall(conversationId, disconnect)}
-              variant={"destructive"}
-            >
-              <span>
-                <Phone
-                  className={"size-4 opacity-50"}
-                  strokeWidth={2}
-                  stroke={"currentColor"}
-                />
-              </span>
-              <span>End Call</span>
-            </Button>
-            <Button
-              className={"flex items-center gap-1"}
-              onClick={handleSwitchPersona}
-              variant={"destructive"}
-            >
-              <span>
-                <Phone
-                  className={"size-4 opacity-50"}
-                  strokeWidth={2}
-                  stroke={"currentColor"}
-                />
-              </span>
-              <span>Switch Personas</span>
-            </Button>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-      </div>
+              <Button
+                className={"flex items-center gap-1"}
+                onClick={() => handleEndCall(conversationId, disconnect)}
+                variant={"destructive"}
+              >
+                <span>
+                  <Phone
+                    className={"size-4 opacity-50"}
+                    strokeWidth={2}
+                    stroke={"currentColor"}
+                  />
+                </span>
+                <span>End Call</span>
+              </Button>
+              <Button
+                className={"flex items-center gap-1"}
+                onClick={handleSwitchPersona}
+                variant={"destructive"}
+              >
+                <span>
+                  <Phone
+                    className={"size-4 opacity-50"}
+                    strokeWidth={2}
+                    stroke={"currentColor"}
+                  />
+                </span>
+                <span>Switch Personas</span>
+              </Button>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div> */}
     </div>
   );
 }

@@ -14,13 +14,12 @@ import { HumeClient } from "hume";
 import { ConversationData, fetchConversationContextAndLastMessage, insertNewConversation } from "@/utils/supabaseClient";
 import AgentComponent from "./Agent";
 
-const CONFIG_ONE = "5a0c849f-bf21-4f9d-97f0-958ff8619fba";
-const CONFIG_TWO = "dbe866f5-2bb7-44df-a73c-846feb59f4ec";
+const CONFIG_ONE = "dbe866f5-2bb7-44df-a73c-846feb59f4ec";
 
 export default function ClientComponent({ accessToken }: { accessToken: string }) {
   const [started, setStarted] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [configId, setConfigId] = useState<string>('dabbd347-11ff-46a6-9a94-4117b1f7ccf9');
+  const [configId, setConfigId] = useState<string>('dbe866f5-2bb7-44df-a73c-846feb59f4ec');
   const [client, setClient] = useState<HumeClient | null>(null);
   const [initialContext, setInitialContext] = useState<string | null>(null);
   const [currentConfig, setCurrentConfig] = useState(CONFIG_ONE);
@@ -115,8 +114,8 @@ export default function ClientComponent({ accessToken }: { accessToken: string }
         <>
           {started && conversationId && initialContext && (
             <VoiceProvider
-              sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
               configId={configId}
+              sessionSettings={{ context: { text: initialContext, type: 'temporary' } }}
               auth={{ type: "accessToken", value: accessToken }}
               onMessage={() => {
                 if (timeout.current) {
