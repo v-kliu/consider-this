@@ -58,7 +58,11 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
 
     setStarted(true); // Continue the conversation
 
-    sendAssistantInput(returnString);
+    try {
+      sendAssistantInput(returnString);
+    } catch (error) {
+      console.error("Error sending assistant input:", error);
+    }
   };
 
   return (
