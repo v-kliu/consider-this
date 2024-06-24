@@ -24,21 +24,21 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
   const { connect, disconnect, status, isMuted, unmute, mute, micFft, lastVoiceMessage, sendAssistantInput } = useVoice();
   const [conversation, setConversation] = useState<any>({});
   const [agents, setAgents] = useState([
-    { active: true, text: 'Agent 1' },
-    { active: false, text: 'Agent 2' }
+    { active: true, text: 'Melody' },
+    { active: false, text: 'Charles' }
   ]);
 
   const switchToConfig1 = () => {
     handleSwitchPersona();
     if (configId === "5a0c849f-bf21-4f9d-97f0-958ff8619fba") {
       setAgents([
-        { active: false, text: 'Agent 1 Config 1' },
-        { active: true, text: 'Agent 2 Config 1' }
+        { active: false, text: 'Melody' },
+        { active: true, text: 'Charles' }
       ]);
     } else {
       setAgents([
-        { active: true, text: 'Agent 1 Config 2' },
-        { active: false, text: 'Agent 2 Config 2' }
+        { active: true, text: 'Melody' },
+        { active: false, text: 'Charles' }
       ]);
     }
 
