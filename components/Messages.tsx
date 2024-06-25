@@ -13,14 +13,6 @@ const Messages = forwardRef<
   const { messages } = useVoice();
 
   return (
-    <motion.div
-      layoutScroll
-      className={"grow rounded-md overflow-auto p-4"}
-      ref={ref}
-    >
-      <motion.div
-        className={"max-w-2xl mx-auto w-full flex flex-col gap-4 pb-24"}
-      >
         <AnimatePresence mode={"popLayout"}>
           {messages.map((msg, index) => {
             if (
@@ -65,9 +57,7 @@ const Messages = forwardRef<
             }
             return null;
           })}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
+        </AnimatePresence> 
   );
 });
 
