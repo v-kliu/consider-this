@@ -1,4 +1,6 @@
 # Consider This
+![Consider This example](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/002/932/950/datas/original.png)
+
 
 ## Overview
 
@@ -25,13 +27,7 @@ Imagine you are a shy eighth-grader named Zelda. Your teacher introduces an assi
 
 - **Frontend**: TypeScript, Next.js, Tailwind CSS
 - **Backend**: Supabase
-
-## Market Size
-
-- **Total Addressable Market (TAM)**: $100+ billion USD (US ed-tech market)
-- **Serviceable Addressable Market (SAM)**: $8 billion USD (funding for K-12 in Illinois)
-- **Serviceable Obtainable Market (SOM)**: TBD (identify schools and school districts that fund new education initiatives)
-
+  
 ## Next Steps
 
 - **Customer Discovery**: Understand the needs of K-12 schools and how our service can benefit them.
