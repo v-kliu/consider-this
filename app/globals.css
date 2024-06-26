@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* Defines main styling colors and fonts for the app */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,4 +1,8 @@
+// Component used to control the voice recognition, and switching between agents
+
 "use client";
+
+// Import necessary modules and components
 import { useVoice } from "@humeai/voice-react";
 import { Button } from "./ui/button";
 import { Mic, MicOff, Phone } from "lucide-react";
@@ -12,6 +16,11 @@ import { fetchConversationContextAndLastMessage, handleEndCall, updateLastMessag
 import { HumeClient } from "hume";
 import AgentComponent from "./Agent";
 
+// Get configuration IDs from environment variables
+const CONFIG_ONE = process.env.NEXT_PUBLIC_AGENT_CONFIG_ONE as string;
+const CONFIG_TWO = process.env.NEXT_PUBLIC_AGENT_CONFIG_TWO as string;
+
+// Define the props for the ChatStage component
 interface ChatStageProps {
   conversationId: string;
   configId: string;
@@ -20,17 +29,22 @@ interface ChatStageProps {
   client: HumeClient | null;
 }
 
+// Define the ChatStage component
 const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConfigId, setStarted, client }) => {
+  // Destructure methods and state from the useVoice hook
   const { connect, disconnect, status, isMuted, unmute, mute, micFft, lastVoiceMessage, sendAssistantInput } = useVoice();
+  
+  // Local state to manage conversation data and agent states
   const [conversation, setConversation] = useState<any>({});
   const [agents, setAgents] = useState([
     { active: true, text: 'Melody' },
     { active: false, text: 'Charles' }
   ]);
 
+  // Function to switch between configurations and update agent states
   const switchToConfig1 = () => {
     handleSwitchPersona();
-    if (configId === "5a0c849f-bf21-4f9d-97f0-958ff8619fba") {
+    if (configId === CONFIG_TWO) {
       setAgents([
         { active: false, text: 'Melody' },
         { active: true, text: 'Charles' }
@@ -41,11 +55,9 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
         { active: false, text: 'Charles' }
       ]);
     }
-
   };
 
-
-
+  // Fetch conversation data when conversationId changes
   useEffect(() => {
     const fetchData = async () => {
       const conversationData = await fetchConversationData(conversationId);
@@ -55,6 +67,7 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
     fetchData();
   }, [conversationId]);
 
+  // Function to handle switching personas
   const handleSwitchPersona = async () => {
     await handleEndCall(conversationId, disconnect);
 
@@ -66,10 +79,8 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
     // Fetch the conversation context and last message
     const returnString = await fetchConversationContextAndLastMessage(conversationId);
 
-    // Change the config ID (example: switch to a different config ID)
-    const newConfigId = configId === 'dbe866f5-2bb7-44df-a73c-846feb59f4ec'
-      ? '5a0c849f-bf21-4f9d-97f0-958ff8619fba' // Replace with actual new config ID
-      : 'dbe866f5-2bb7-44df-a73c-846feb59f4ec';
+    // Change the config ID (switch between CONFIG_ONE and CONFIG_TWO)
+    const newConfigId = configId === CONFIG_ONE ? CONFIG_TWO : CONFIG_ONE;
 
     console.log(newConfigId);
 
@@ -108,6 +119,7 @@ const ChatStage: React.FC<ChatStageProps> = ({ conversationId, configId, setConf
           </div>
         ))}
       </div>
+      {/* Uncomment and adjust the following section if needed for additional controls */}
       {/* <div
         className={
           cn(

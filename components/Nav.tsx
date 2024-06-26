@@ -1,15 +1,18 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
-
+import { useEffect } from "react";
 import Logo from "./logos/socratesLogo.png";
 
-import { Button } from "./ui/button";
-import { Moon, Sun } from "lucide-react";
-import Github from "./logos/GitHub";
-import pkg from '@/package.json';
-
 export const Nav = () => {
+  useEffect(() => {
+    // Add the overflow-hidden class to the body when the Nav component is mounted
+    document.body.classList.add('overflow-hidden');
+
+    // Remove the overflow-hidden class from the body when the Nav component is unmounted
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, []);
 
   return (
     <>
@@ -32,6 +35,5 @@ export const Nav = () => {
         </div>
       </div>
     </>
-
   );
 };
