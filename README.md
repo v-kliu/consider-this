@@ -3,12 +3,11 @@
 
 [Demo Link](https://youtu.be/NayCttrijjo)
 
-
 ## Overview
 
-The world around us is rich with various opinions and biases. In this digital age, we engage with diverse content curated by algorithms that mirror our preferences and maximize our engagement on various platforms. This often results in an "echo-chamber," reinforcing our biases and social-political niches. Such echo chambers can hinder our ability to engage in productive discussions and make informed decisions, posing a significant challenge, especially for the younger generation growing up in the digital age.
+**Consider This** was founded at the **Berkeley AI Hackathon 2024** with a mission to foster healthy, empathetic discussions using AI. In today's digital age, algorithms curate content that often reflects our preferences, creating an "echo chamber" that reinforces biases and limits exposure to diverse opinions. This is especially concerning for the younger generation, who might struggle to engage in productive conversations or make informed decisions due to these echo chambers.
 
-**Consider This** is an innovative educational tool designed to foster healthy, empathetic discussions with AI agents, powered by Hume's cutting-edge EVI technology. Our platform helps users think critically, break free from echo chambers, and engage more thoughtfully.
+Our innovative educational tool leverages Hume's cutting-edge EVI technology to help users think critically and break free from these digital confines.
 
 ## Problem Statement
 
@@ -29,10 +28,13 @@ Imagine you are a shy eighth-grader named Zelda. Your teacher introduces an assi
 
 - **Frontend**: TypeScript, Next.js, Tailwind CSS
 - **Backend**: Supabase
-  
+
 ## Next Steps
 
 - **Customer Discovery**: Understand the needs of K-12 schools and how our service can benefit them.
 - **Pilot Programs**: Implement pilot programs in select schools to gather feedback and refine our platform.
+
+## Team
+![Team Picture]([path/to/team-picture.jpg](https://cdn.discordapp.com/attachments/304838063056486400/1285477121111621662/image.jpg?ex=66ea695c&is=66e917dc&hm=2a4cdd22847d17fc632c393a9e12a7588c2d958287e3436d2c9726f7dd0faec8&))
 
 Thank you for your interest in **Consider This**! Together, we can create a more open-minded and critically thinking generation.
