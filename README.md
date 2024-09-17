@@ -35,6 +35,6 @@ Imagine you are a shy eighth-grader named Zelda. Your teacher introduces an assi
 - **Pilot Programs**: Implement pilot programs in select schools to gather feedback and refine our platform.
 
 ## Team
-![Team Picture]([path/to/team-picture.jpg](https://cdn.discordapp.com/attachments/304838063056486400/1285477121111621662/image.jpg?ex=66ea695c&is=66e917dc&hm=2a4cdd22847d17fc632c393a9e12a7588c2d958287e3436d2c9726f7dd0faec8&))
+![Team Picture](/public/images/team-picture.jpg)
 
 Thank you for your interest in **Consider This**! Together, we can create a more open-minded and critically thinking generation.
